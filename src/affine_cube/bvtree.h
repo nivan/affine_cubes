@@ -2,6 +2,7 @@
 #define BVTREE_H
 
 #include "boundingvolume.h"
+#include <stdint.h>
 
 //
 struct DotProductComparison {
@@ -13,6 +14,19 @@ public:
 };
 
 void sortByDotProduct(std::vector<Vector>& points, Vector *direction);
+
+class Histogram2DBin{
+public:
+    double minX;
+    double maxX;
+    double minY;
+    double maxY;
+    uint64_t count;
+public:
+    Histogram2DBin();
+    Histogram2DBin(double minX, double maxX, double minY, double maxY, uint64_t count);
+    std::string toString();
+};
 
 //
 class BVTreeNode{
@@ -33,8 +47,14 @@ public:
     void setLeftChild(BVTreeNode*);
     void setRightChild(BVTreeNode*);
     void setPoints(std::vector<Vector>& points);
+
+    int  getNumPoints();
+    BVTreeNode* getLeftChild();
+    BVTreeNode* getRightChild();
 public:
-    int countNumNodesWithDotProductBetween(double minValue,double maxValue, Vector& probeDirection);
+
+    int countNumPointsWithDotProductBetween(double minValue,double maxValue, Vector& probeDirection);
+    void getDotProductRange(const Vector& direction, double &minValue, double& maxValue);
 };
 
 //
@@ -52,6 +72,8 @@ public:
     ~BVTree();
 public:
     int countNumNodesWithDotProductBetween(double minValue,double maxValue, Vector& probeDirection);
+    void getUnbinnedHistogram(const Vector& xAxis, const Vector& yAxis, int maxDepth, std::vector<Histogram2DBin>& result);
+    void getDotProductRange(const Vector& direction, double &minValue, double& maxValue);
 };
 
 void testBVTree();

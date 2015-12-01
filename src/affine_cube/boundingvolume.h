@@ -18,7 +18,7 @@ class BoundingVolume{
 public:
     virtual int numPlanes() {return 0;};
     virtual HyperPlane getHyperPlane(int i) = 0;
-    virtual void getDotProductRangeInVolume(Vector& direction, double& minV, double& maxV) = 0;
+    virtual void getDotProductRangeInVolume(const Vector& direction, double& minV, double& maxV) = 0;
     virtual Vector getDirectionOfLargestVariance() = 0;
 };
 
@@ -31,7 +31,7 @@ public:
 public:
     int numPlanes();
     HyperPlane getHyperPlane(int i);
-    void getDotProductRangeInVolume(Vector& direction, double& minV, double& maxV);
+    void getDotProductRangeInVolume(const Vector& direction, double& minV, double& maxV);
     Vector getDirectionOfLargestVariance();
 public:
     static AxisAlignedBoundingVolume* getAxisAlignedBoundingVolume(std::vector<Vector>& points);

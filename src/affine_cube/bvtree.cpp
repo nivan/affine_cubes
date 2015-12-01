@@ -1,15 +1,20 @@
 #include "bvtree.h"
 #include <cassert>
 #include <algorithm>
+#include <queue>
+#include <sstream>
 #include <iostream>
 
 using namespace std;
+
+/*****************
+ * Aux Functions *
+ *****************/
 
 void sortByDotProduct(std::vector<Vector> &points, Vector* direction){
     DotProductComparison comparator(direction);
     std::sort(points.begin(),points.end(),comparator);
 }
-
 
 /************************
  * DotProductComparison *
@@ -22,6 +27,33 @@ DotProductComparison::DotProductComparison(Vector* v):
 bool DotProductComparison::operator() (const Vector& v1,const Vector& v2){
     return v->dot(v1) < v->dot(v2);
 }
+
+/******************
+ * Histogram2DBin *
+ ******************/
+
+Histogram2DBin::Histogram2DBin():
+    minX(0),
+    maxX(-1),
+    minY(0),
+    maxY(0),
+    count(0)
+{}
+
+Histogram2DBin::Histogram2DBin(double minX, double maxX, double minY, double maxY, uint64_t count):
+    minX(minX),
+    maxX(maxX),
+    minY(minY),
+    maxY(maxY),
+    count(count)
+{}
+
+std::string Histogram2DBin::toString(){
+    std::stringstream ss;
+    ss << "(" << minX << "," << maxX << ") X (" << minY << "," << maxY << ") : " << count;
+    return ss.str();
+}
+
 
 /**************
  * BVTreeNode *
@@ -75,7 +107,20 @@ void BVTreeNode::setPoints(std::vector<Vector> &points){
     this->points = points;
 }
 
-int BVTreeNode::countNumNodesWithDotProductBetween(double minValue, double maxValue, Vector &probeDirection){
+int BVTreeNode::getNumPoints(){
+    return this->numPoints;
+}
+
+
+BVTreeNode* BVTreeNode::getLeftChild(){
+    return this->leftChild;
+}
+
+BVTreeNode* BVTreeNode::getRightChild(){
+    return this->rightChild;
+}
+
+int BVTreeNode::countNumPointsWithDotProductBetween(double minValue, double maxValue, Vector &probeDirection){
     double minDotProductInBV;
     double maxDotProductInBV;
     this->boundingVolume->getDotProductRangeInVolume(probeDirection,minDotProductInBV,maxDotProductInBV);
@@ -92,8 +137,8 @@ int BVTreeNode::countNumNodesWithDotProductBetween(double minValue, double maxVa
         //partial overlap
         int totalCount = 0;
         if(this->leftChild && this->rightChild){
-            totalCount += this->leftChild->countNumNodesWithDotProductBetween(minValue,maxValue,probeDirection);
-            totalCount += this->rightChild->countNumNodesWithDotProductBetween(minValue,maxValue,probeDirection);
+            totalCount += this->leftChild->countNumPointsWithDotProductBetween(minValue,maxValue,probeDirection);
+            totalCount += this->rightChild->countNumPointsWithDotProductBetween(minValue,maxValue,probeDirection);
         }
         else{
             //TODO: need to check the original points??
@@ -109,6 +154,10 @@ int BVTreeNode::countNumNodesWithDotProductBetween(double minValue, double maxVa
         }
         return totalCount;
     }
+}
+
+void BVTreeNode::getDotProductRange(const Vector &direction, double &minValue, double &maxValue){
+    this->boundingVolume->getDotProductRangeInVolume(direction,minValue,maxValue);
 }
 
 
@@ -135,9 +184,43 @@ BVTree::~BVTree(){
 
 int BVTree::countNumNodesWithDotProductBetween(double minValue, double maxValue, Vector &probeDirection){
     if(this->root)
-        return this->root->countNumNodesWithDotProductBetween(minValue,maxValue,probeDirection);
+        return this->root->countNumPointsWithDotProductBetween(minValue,maxValue,probeDirection);
     else
         return 0;
+}
+
+void BVTree::getUnbinnedHistogram(const Vector &xAxis, const Vector &yAxis, int maxDepth, std::vector<Histogram2DBin> &result){
+    std::queue<std::pair<int,BVTreeNode*> > nodes;
+    nodes.push(std::make_pair(0,this->root));
+    while(!nodes.empty()){
+        std::pair<int,BVTreeNode*> current = nodes.front();
+        nodes.pop();
+
+        //
+        int currentDepth = current.first;
+        BVTreeNode* currentNode = current.second;
+        BVTreeNode* leftChild = currentNode->getLeftChild();
+        BVTreeNode* rightChild = currentNode->getRightChild();
+        if(currentDepth < maxDepth && leftChild && rightChild){
+                //partition node
+                nodes.push(std::make_pair(currentDepth+1,leftChild));
+                nodes.push(std::make_pair(currentDepth+1,rightChild));
+        }
+        else{
+            double minX;
+            double maxX;
+            currentNode->getDotProductRange(xAxis,minX,maxX);
+            double minY;
+            double maxY;
+            currentNode->getDotProductRange(yAxis,minY,maxY);
+            result.push_back(Histogram2DBin(minX,maxX,minY,maxY,currentNode->getNumPoints()));
+        }
+    }
+}
+
+void BVTree::getDotProductRange(const Vector &direction, double &minValue, double &maxValue){
+    if(this->root)
+        this->root->getDotProductRange(direction,minValue,maxValue);
 }
 
 template<typename T>
@@ -166,16 +249,6 @@ void BVTree::buildTree(std::vector<Vector> points, BVTreeNode *currentNode, int 
         Vector direction = currentNode->getBoundingVolume()->getDirectionOfLargestVariance();
         sortByDotProduct(points,&direction);
         int midIndex = numPoints / 2;
-        double median = direction.dot(points[midIndex]);
-
-        //
-        while(midIndex < numPoints){
-            double currentValue = direction.dot(points[midIndex]);
-            if(currentValue > median)
-                break;
-            else
-                ++midIndex;
-        }
 
         //
         std::vector<Vector> leftPoints;
@@ -201,7 +274,7 @@ void BVTree::buildTree(std::vector<Vector> points, BVTreeNode *currentNode, int 
  *****************/
 
 void testBVTree(){
-  
+
     //
     Vector v1(3);
     v1[0] = 1.0;
@@ -227,12 +300,12 @@ void testBVTree(){
     sortByDotProduct(points,&probeVector);
     cout << "Sorted Vector" << endl;
     for(int i = 0 ; i < points.size() ; ++i){
-      cout << "Vector " << i << " : " << points.at(i).toString() << endl;
+        cout << "Vector " << i << " : " << points.at(i).toString().c_str() << endl;
     }
 
     //
     points.clear();
-    int numPoints = 100000;
+    int numPoints = 1000;
     int numDimensions = 4;
     for(int i = 0 ; i < numPoints ; ++i){
         Vector point(numDimensions);
@@ -240,7 +313,6 @@ void testBVTree(){
             point[d] = (rand() * 1.0) / RAND_MAX;
         }
         points.push_back(point);
-        //cout << "Point " << i << " : " << point.toString() << endl;
     }
 
     //
@@ -249,16 +321,29 @@ void testBVTree(){
     Vector queryVector(4);
     queryVector[0] = 1.0;
     queryVector[2] = 2.0;
+    queryVector[3] = -5.0;
     //brute force
     double minInterval = 0.25;
     double maxInterval = 0.75;
     int count = 0;
     for(int i = 0 ; i < numPoints ; ++i){
-        double value = points.at(i)[0] + 2.0 * points.at(i)[2];
+        double value = points.at(i)[0] + 2.0 * points.at(i)[2] - 5*points.at(i)[3];
         if(minInterval <= value && value <= maxInterval)
             count++;
     }
-    cout << "Brute Force " << count << endl;
+
+
     //
-    cout << myTree.countNumNodesWithDotProductBetween(minInterval,maxInterval,queryVector) << endl;
+    Vector xAxis(4);
+    xAxis[0] = 1.0;
+    Vector yAxis(4);
+    yAxis[1] = 1.0;
+    std::vector<Histogram2DBin> result;
+    myTree.getUnbinnedHistogram(xAxis,yAxis,100,result);
+    int numbins = result.size();
+    cout << "Num Bins " << numbins << endl;
+    for(int i = 0 ; i < numbins ; ++i){
+        Histogram2DBin bin = result.at(i);
+        cout << "    Bin " << i << " " << bin.toString() << endl;
+    }
 }

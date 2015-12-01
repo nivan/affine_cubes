@@ -38,7 +38,7 @@ int AxisAlignedBoundingVolume::numPlanes(){
 
 
 HyperPlane AxisAlignedBoundingVolume::getHyperPlane(int i){
-    assert(0 <= i < this->numPlanes());
+    assert(0 <= i && i < this->numPlanes());
     int numDimensions = dimensionBounds.size();
     int dimensionIndex = i % numDimensions;
     bool leftPlane = i < numDimensions;
@@ -124,7 +124,7 @@ AxisAlignedBoundingVolume *AxisAlignedBoundingVolume::getAxisAlignedBoundingVolu
 }
 
 
-void AxisAlignedBoundingVolume::getDotProductRangeInVolume(Vector& direction,double& minDotProduct,double& maxDotProduct){
+void AxisAlignedBoundingVolume::getDotProductRangeInVolume(const Vector& direction,double& minDotProduct,double& maxDotProduct){
     int numDimensions = this->dimensionBounds.size();
     assert(numDimensions == direction.getDimension());
 
