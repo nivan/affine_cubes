@@ -236,6 +236,10 @@ void partitionVector(std::vector<T> &container, int partitionIndex,std::vector<T
     }
 }
 
+int BVTree::getNumPoints(){
+  return this->root->getNumPoints();
+}
+
 void BVTree::buildTree(std::vector<Vector> points, BVTreeNode *currentNode, int &numNodes){
     //init node information
     currentNode->init(points);

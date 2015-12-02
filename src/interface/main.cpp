@@ -5,7 +5,6 @@
 #include "../affine_cube/bvtree.h"
 #include "glhistogramwidget.h"
 
-
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);

@@ -22,6 +22,9 @@ private:
     double minY;
     double maxY;
     ColorScale* scale;
+private:
+    Vector* xAxis;
+    Vector* yAxis;
 protected:
     void paintEvent(QPaintEvent * event);
 

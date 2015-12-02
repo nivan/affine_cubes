@@ -74,6 +74,7 @@ public:
     int countNumNodesWithDotProductBetween(double minValue,double maxValue, Vector& probeDirection);
     void getUnbinnedHistogram(const Vector& xAxis, const Vector& yAxis, int maxDepth, std::vector<Histogram2DBin>& result);
     void getDotProductRange(const Vector& direction, double &minValue, double& maxValue);
+    int  getNumPoints();
 };
 
 void testBVTree();

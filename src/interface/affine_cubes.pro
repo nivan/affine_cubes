@@ -58,3 +58,9 @@ HEADERS  += widget.h \
     glhistogramwidget.h
 
 FORMS    += widget.ui
+
+INCLUDEPATH += "/home/nivan/src/crow/include"
+
+QMAKE_CXXFLAGS += -std=c++0x
+
+LIBS += -lboost_system
