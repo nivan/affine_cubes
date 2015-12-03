@@ -64,7 +64,7 @@ void createCube(){
 
 std::string bin2JSONObject(Histogram2DBin& bin){
   std::stringstream ss;
-  ss << "{xmin:" << bin.minX << ",xmax:" << bin.maxX << ",ymin:" << bin.minY << ",ymax:" << bin.maxY << ",count:" << bin.count << "}";
+  ss << "{\"xmin\":" << bin.minX << ",\"xmax\":" << bin.maxX << ",\"ymin\":" << bin.minY << ",\"ymax\":" << bin.maxY << ",\"count\":" << bin.count << "}";
   return ss.str();
 }
 
@@ -87,9 +87,12 @@ int main(){
   CROW_ROUTE(app, "/build_histogram_2d")
     .methods("POST"_method)
     ([](const crow::request& req){
+      std::cout << "----> Build Histogram" << std::endl;
       auto x = crow::json::load(req.body);
       if (!x)
 	return crow::response(400);
+
+      std::cout << "----------> JSON OK" << std::endl;
 
       //
       auto vectorX = x["x_axis"];
@@ -138,7 +141,13 @@ int main(){
       os << "]";
 
       //
-      return crow::response{os.str()};
+      crow::response myResponse = {os.str()};
+      myResponse.add_header("Access-Control-Allow-Origin", "http://localhost:8000");
+      myResponse.add_header("Access-Control-Allow-Methods", "GET, PUT, POST, DELETE, OPTIONS");
+      myResponse.add_header("Access-Control-Max-Age", "1000");
+      myResponse.add_header("Access-Control-Allow-Headers", "Content-Type, Authorization, X-Requested-With");
+  
+      return myResponse;
     });
 
   // ignore all log
