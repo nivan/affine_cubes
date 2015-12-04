@@ -16,17 +16,45 @@ public:
 
 class BoundingVolume{
 public:
-    virtual int numPlanes() {return 0;};
-    virtual HyperPlane getHyperPlane(int i) = 0;
+    virtual ~BoundingVolume() {};
     virtual void getDotProductRangeInVolume(const Vector& direction, double& minV, double& maxV) = 0;
     virtual Vector getDirectionOfLargestVariance() = 0;
 };
 
-class AxisAlignedBoundingVolume: public BoundingVolume{
+//
+class Sphere: public BoundingVolume{
+private:
+    Vector* center;
+    double  radius;
+    Vector* directionOfLargestVariance;
+public:
+    Sphere();
+    Sphere(Vector&,double);
+    Sphere(std::vector<Vector>&);
+    ~Sphere();
+     std::string toString();
+public:
+    Vector getCenter();
+    double gerRadius();
+    bool contains(const Vector& point);
+public:
+    void getDotProductRangeInVolume(const Vector& direction, double& minV, double& maxV);
+    Vector getDirectionOfLargestVariance();
+};
+
+//
+class Polytope: public BoundingVolume {
+public:
+    virtual int numPlanes() {return 0;};
+    virtual HyperPlane getHyperPlane(int i) = 0;
+};
+
+class AxisAlignedBoundingVolume: public Polytope{
 private:
     std::vector<std::pair<double,double> > dimensionBounds;
 public:
     AxisAlignedBoundingVolume(std::vector<std::pair<double,double> >& dimensionBounds);
+    AxisAlignedBoundingVolume(std::vector<Vector>& points);
     std::string toString();
 public:
     int numPlanes();
@@ -39,5 +67,6 @@ public:
 };
 
 void testBoundingVolume();
+void testSphere();
 
 #endif // BOUNDINGVOLUME_H

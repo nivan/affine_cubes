@@ -33,7 +33,12 @@ SOURCES += main.cpp\
     util/colorbar.cpp \
     util/bluetoyellowscale.cpp \
     util/bluetocyanscale.cpp \
-    glhistogramwidget.cpp
+    glhistogramwidget.cpp \
+    ../miniball/Seb_debug.C \
+    ../miniball/miniballcomputation.cpp \
+    ../affine_cube/dotproductcomparison.cpp \
+    ../affine_cube/auxfunctions.cpp \
+    ../affine_cube/histogram2dbin.cpp
 
 HEADERS  += widget.h \
     ../affine_cube/Vector.h \
@@ -55,7 +60,18 @@ HEADERS  += widget.h \
     util/colorbar.h \
     util/bluetoyellowscale.h \
     util/bluetocyanscale.h \
-    glhistogramwidget.h
+    glhistogramwidget.h \
+    ../miniball/Subspan.h \
+    ../miniball/Subspan-inl.h \
+    ../miniball/Seb_point.h \
+    ../miniball/Seb_debug.h \
+    ../miniball/Seb_configure.h \
+    ../miniball/Seb.h \
+    ../miniball/Seb-inl.h \
+    ../miniball/miniballcomputation.h \
+    ../affine_cube/dotproductcomparison.h \
+    ../affine_cube/auxfunctions.h \
+    ../affine_cube/histogram2dbin.h
 
 FORMS    += widget.ui
 

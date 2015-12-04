@@ -3,7 +3,7 @@
 #include <string>
 #include <cmath>
 
-#define VECTOR_TYPE float
+#define VECTOR_TYPE double
 
 class Vector
 {
@@ -21,8 +21,8 @@ public:
         values[index] = value;
     }
     inline void setValues(const VECTOR_TYPE *newValues) {
-      for(int i = 0 ; i < dimension ; ++i)
-        values[i] = newValues[i];
+        for(int i = 0 ; i < dimension ; ++i)
+            values[i] = newValues[i];
     }
     void alloc(int size) {
         if (values) {
@@ -32,12 +32,12 @@ public:
         dimension = size;
     }
     inline void setValues(const Vector& v) {
-      for(int i = 0 ; i < dimension ; ++i)
-        values[i] = v[i];
+        for(int i = 0 ; i < dimension ; ++i)
+            values[i] = v[i];
     }
     inline void setValues(VECTOR_TYPE newValue) {
-      for(int i = 0 ; i < dimension ; ++i)
-        values[i] = newValue;
+        for(int i = 0 ; i < dimension ; ++i)
+            values[i] = newValue;
     }
 
     inline VECTOR_TYPE operator[](int index) const {
@@ -48,7 +48,7 @@ public:
         return values[index];
     }
 
-    inline Vector& operator=(const Vector& v) { 
+    inline Vector& operator=(const Vector& v) {
         if (v.getDimension() != getDimension()) {
             alloc(v.getDimension());
         }
@@ -57,34 +57,34 @@ public:
     }
 
     inline void add(const Vector& v) {
-      for(int i = 0 ; i < dimension ; ++i)
-        values[i] += v[i];
+        for(int i = 0 ; i < dimension ; ++i)
+            values[i] += v[i];
     }
     inline void add(const Vector& v, Vector& result) {
-      for(int i = 0 ; i < dimension ; ++i)
-        result.setValue(i,values[i] + v[i]);
+        for(int i = 0 ; i < dimension ; ++i)
+            result.setValue(i,values[i] + v[i]);
     }
     inline void scale(VECTOR_TYPE s) {
-      for(int i = 0 ; i < dimension ; ++i)
-	values[i] *= s;
+        for(int i = 0 ; i < dimension ; ++i)
+            values[i] *= s;
     }
     inline void scale(VECTOR_TYPE s, Vector& v) {
-      for(int i = 0 ; i < dimension ; ++i)
-        v.setValue(i, values[i] * s);
+        for(int i = 0 ; i < dimension ; ++i)
+            v.setValue(i, values[i] * s);
     }
     inline VECTOR_TYPE length2() const {
-      VECTOR_TYPE norm = 0.0;
-      for(int i = 0 ; i < dimension ; ++i)
-        norm += (values[i] * values[i]);
-      return norm;
+        VECTOR_TYPE norm = 0.0;
+        for(int i = 0 ; i < dimension ; ++i)
+            norm += (values[i] * values[i]);
+        return norm;
     }
     inline VECTOR_TYPE length() const { return sqrtf(length2()); }
 
     inline VECTOR_TYPE dot(const Vector& v) const {
-      VECTOR_TYPE norm = 0.0;
-      for(int i = 0 ; i < dimension ; ++i)
-        norm += (values[i] * v[i]);
-      return norm;
+        VECTOR_TYPE norm = 0.0;
+        for(int i = 0 ; i < dimension ; ++i)
+            norm += (values[i] * v[i]);
+        return norm;
     }
 
     inline void add_scale(const Vector &v, VECTOR_TYPE b, VECTOR_TYPE a=1.0) {
@@ -101,12 +101,20 @@ public:
     }
 
     inline void sub(const Vector& v) {
-      for(int i = 0 ; i < dimension ; ++i)
-        values[i] -= v[i];
+        for(int i = 0 ; i < dimension ; ++i)
+            values[i] -= v[i];
     }
     inline void sub(const Vector& v, Vector& result) {
-      for(int i = 0 ; i < dimension ; ++i)
-        result.setValue(i,values[i] - v[i]);
+        for(int i = 0 ; i < dimension ; ++i)
+            result.setValue(i,values[i] - v[i]);
+    }
+
+    inline void normalize() {
+        double myNorm = this->length();
+        if(myNorm > 0){
+            for(int i = 0 ; i < dimension ; ++i)
+                values[i] /= myNorm;
+        }
     }
 
     inline Vector &operator+=(const Vector &v) {

@@ -42,7 +42,7 @@ struct ExampleMiddleware
 };
 
 int numDimensions = 4;
-BVTree* myTree = NULL;
+BVTree<AxisAlignedBoundingVolume>* myTree = NULL;
 
 void createCube(){
 
@@ -59,7 +59,7 @@ void createCube(){
       points.push_back(point);
     }
 
-    myTree = new BVTree(points);
+    myTree = new BVTree<AxisAlignedBoundingVolume>(points);
 }
 
 std::string bin2JSONObject(Histogram2DBin& bin){
@@ -87,12 +87,10 @@ int main(){
   CROW_ROUTE(app, "/build_histogram_2d")
     .methods("POST"_method)
     ([](const crow::request& req){
-      std::cout << "----> Build Histogram" << std::endl;
+
       auto x = crow::json::load(req.body);
       if (!x)
 	return crow::response(400);
-
-      std::cout << "----------> JSON OK" << std::endl;
 
       //
       auto vectorX = x["x_axis"];
@@ -101,16 +99,10 @@ int main(){
       int yDim = vectorY.size();
       auto treeDepth = x["depth"];
 
-      std::cout << "x type " << (vectorX.t() == crow::json::type::List) << std::endl;
-      std::cout << "y type " << (vectorY.t() == crow::json::type::List) << std::endl;
-      std::cout << "d type " << (treeDepth.t() == crow::json::type::Number) << std::endl;
-      std::cout << "xDim " << xDim << " yDim " << yDim << " numDimensions " << numDimensions << std::endl;
-
       if(vectorX.t() != crow::json::type::List || vectorY.t() != crow::json::type::List || 
 	 treeDepth.t() != crow::json::type::Number || xDim != numDimensions || yDim != numDimensions)
 	return crow::response(400);
       
-      std::cout << "HERE+++++++++++" << std::endl;
 
       //get parameters
       int depth = treeDepth.d();

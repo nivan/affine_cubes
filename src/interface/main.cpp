@@ -7,16 +7,10 @@
 
 int main(int argc, char *argv[])
 {
+
     QApplication a(argc, argv);
     Widget w;
-    //GLHistogramWidget w;
     w.show();
-
-//    return a.exec();
-
-    //testBoundingVolume();
-
-    //testBVTree();
 
     return a.exec();
 }

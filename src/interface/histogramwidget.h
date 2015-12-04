@@ -5,6 +5,9 @@
 #include "../affine_cube/bvtree.h"
 #include "util/colorscale.h"
 
+//#define BOUNDING_VOLUME_T Sphere
+#define BOUNDING_VOLUME_T AxisAlignedBoundingVolume
+
 void readCSVPoints(QString filename,std::vector<Vector>& points);
 
 class HistogramWidget : public QWidget
@@ -15,7 +18,7 @@ public:
     ~HistogramWidget();
 
 private:
-    BVTree* myTree;
+    BVTree<BOUNDING_VOLUME_T>* myTree;
     int depth;
     double minX;
     double maxX;
