@@ -31,6 +31,9 @@ public:
     Sphere();
     Sphere(Vector&,double);
     Sphere(std::vector<Vector>&);
+    Sphere(std::vector<Vector>& points, int beginIndex, int endIndex);
+    template<class iterator_type>
+    Sphere(iterator_type beginIterator, iterator_type endIterator);
     ~Sphere();
      std::string toString();
 public:
@@ -55,6 +58,7 @@ private:
 public:
     AxisAlignedBoundingVolume(std::vector<std::pair<double,double> >& dimensionBounds);
     AxisAlignedBoundingVolume(std::vector<Vector>& points);
+    AxisAlignedBoundingVolume(std::vector<Vector>& points, int beginIndex, int endIndex);
     std::string toString();
 public:
     int numPlanes();

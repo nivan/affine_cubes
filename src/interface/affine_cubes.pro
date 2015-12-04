@@ -38,7 +38,8 @@ SOURCES += main.cpp\
     ../miniball/miniballcomputation.cpp \
     ../affine_cube/dotproductcomparison.cpp \
     ../affine_cube/auxfunctions.cpp \
-    ../affine_cube/histogram2dbin.cpp
+    ../affine_cube/histogram2dbin.cpp \
+    ../affine_cube/generalbvtree.cpp
 
 HEADERS  += widget.h \
     ../affine_cube/Vector.h \
@@ -71,7 +72,8 @@ HEADERS  += widget.h \
     ../miniball/miniballcomputation.h \
     ../affine_cube/dotproductcomparison.h \
     ../affine_cube/auxfunctions.h \
-    ../affine_cube/histogram2dbin.h
+    ../affine_cube/histogram2dbin.h \
+    ../affine_cube/generalbvtree.h
 
 FORMS    += widget.ui
 

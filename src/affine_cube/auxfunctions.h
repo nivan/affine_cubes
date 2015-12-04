@@ -5,5 +5,6 @@
 #include "Vector.h"
 
 void sortByDotProduct(std::vector<Vector>& points, Vector *direction);
+void sortPortionByDotProduct(std::vector<Vector>& points, int beginIndex, int endIndex, Vector *direction);
 
 #endif // AUXFUNCTIONS_H

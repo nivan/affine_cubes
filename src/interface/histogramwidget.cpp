@@ -11,7 +11,7 @@ HistogramWidget::HistogramWidget(QWidget *parent) : QWidget(parent),
     this->depth = 0;
     std::vector<Vector> points;
 
-#if 1
+#if 0
     //random data
     int numDimensions = 4;
     xAxis = new Vector(numDimensions);
@@ -44,15 +44,35 @@ HistogramWidget::HistogramWidget(QWidget *parent) : QWidget(parent),
     }
 
     readCSVPoints("../../data/i_band.csv",points);
+#elif 1
+    //random data
+    int numDimensions = 2;
+    xAxis = new Vector(numDimensions);
+    yAxis = new Vector(numDimensions);
+    //
+    (*xAxis)[0] = 1.0;
+    //
+    (*yAxis)[1] = 1.0;
+
+    int numPoints = 1000;
+    for(int i = 0 ; i < numPoints ; ++i){
+        Vector point(numDimensions);
+        for(int d = 0 ; d < numDimensions ; ++d){
+            point[d] = (rand() * 1.0) / RAND_MAX;
+        }
+        points.push_back(point);
+    }
 #endif
 
 
     //
     qDebug() << "building tree";
-    myTree = new BVTree<BOUNDING_VOLUME_T>(points);
+    //myTree = new BVTree<BOUNDING_VOLUME_T>(points);
+    myTree = new GeneralBVTree<BOUNDING_VOLUME_T>(points);
     qDebug() << "done building tree";
-    myTree->getDotProductRange(*xAxis,minX,maxX);
-    myTree->getDotProductRange(*yAxis,minY,maxY);
+
+//    myTree->getDotProductRange(*xAxis,minX,maxX);
+//    myTree->getDotProductRange(*yAxis,minY,maxY);
     minX = minY = 0.0;
     maxX = maxY = 1.0;
 }

@@ -3,6 +3,7 @@
 
 #include <QWidget>
 #include "../affine_cube/bvtree.h"
+#include "../affine_cube/generalbvtree.h"
 #include "util/colorscale.h"
 
 //#define BOUNDING_VOLUME_T Sphere
@@ -18,7 +19,8 @@ public:
     ~HistogramWidget();
 
 private:
-    BVTree<BOUNDING_VOLUME_T>* myTree;
+    //BVTree<BOUNDING_VOLUME_T>* myTree;
+    GeneralBVTree<BOUNDING_VOLUME_T>* myTree;
     int depth;
     double minX;
     double maxX;

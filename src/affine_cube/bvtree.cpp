@@ -319,4 +319,6 @@ void testBVTree(){
         Histogram2DBin bin = result.at(i);
         cout << "    Bin " << i << " " << bin.toString() << endl;
     }
+
+
 }

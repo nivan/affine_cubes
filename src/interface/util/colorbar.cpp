@@ -105,7 +105,7 @@ void ColorBar::paint(QPainter *painter) {
     }
 }
 
-bool ColorBar::processMouseEvent(QMouseEvent *event) {
+bool ColorBar::processMouseEvent(QMouseEvent *) {
 //    if (event->button()==Qt::LeftButton && event->type()==QEvent::MouseButtonPress){
 //        _leftButtonPress = true;
 //        _minSel = _maxSel = event->pos().y();

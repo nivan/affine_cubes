@@ -6,14 +6,18 @@
 #include "auxfunctions.h"
 #include "histogram2dbin.h"
 
-//
+/**************
+ * BVTreeNode *
+ **************/
+
 template<class TypeOfBV>
 class BVTreeNode{
 private:
     BVTreeNode*     leftChild;
     BVTreeNode*     rightChild;
     BoundingVolume* boundingVolume;
-    int             numPoints;
+    int             beginIndex;
+    int             endIndex;
     std::vector<Vector> points;
 public:
     BVTreeNode();
@@ -26,6 +30,7 @@ public:
     void setLeftChild(BVTreeNode*);
     void setRightChild(BVTreeNode*);
     void setPoints(std::vector<Vector>& points);
+    bool isLeaf();
 
     int  getNumPoints();
     BVTreeNode* getLeftChild();
@@ -36,28 +41,28 @@ public:
     void getDotProductRange(const Vector& direction, double &minValue, double& maxValue);
 };
 
-/**************
- * BVTreeNode *
- **************/
-
 template<class TypeOfBV>
 BVTreeNode<TypeOfBV>::BVTreeNode():
     leftChild(NULL),
-    rightChild(NULL){
-
-}
+    rightChild(NULL),
+    boundingVolume(NULL),
+    beginIndex(-1),
+    endIndex(0)
+{}
 
 template<class TypeOfBV>
 BVTreeNode<TypeOfBV>::BVTreeNode(std::vector<Vector>& points):
     leftChild(NULL),
-    rightChild(NULL){
+    rightChild(NULL),
+    boundingVolume(NULL){
     init(points);
 }
 
 template<class TypeOfBV>
 void BVTreeNode<TypeOfBV>::init(std::vector<Vector>& points){
-    this->boundingVolume = new TypeOfBV(points);//AxisAlignedBoundingVolume::getAxisAlignedBoundingVolume(points);
-    this->numPoints = points.size();
+    this->boundingVolume = new TypeOfBV(points);
+    this->beginIndex = 0;
+    this->endIndex = points.size();
     this->points.clear();
 }
 
@@ -92,8 +97,15 @@ void BVTreeNode<TypeOfBV>::setPoints(std::vector<Vector> &points){
 }
 
 template<class TypeOfBV>
+bool BVTreeNode<TypeOfBV>::isLeaf(){
+    return (this->leftChild == NULL) && (this->rightChild == NULL);
+}
+
+
+template<class TypeOfBV>
 int BVTreeNode<TypeOfBV>::getNumPoints(){
-    return this->numPoints;
+    //return this->numPoints;
+    return this->endIndex - this->beginIndex;
 }
 
 template<class TypeOfBV>
@@ -123,7 +135,7 @@ int BVTreeNode<TypeOfBV>::countNumPointsWithDotProductBetween(double minValue, d
     else{
         //partial overlap
         int totalCount = 0;
-        if(this->leftChild && this->rightChild){
+        if(!this->isLeaf()){
             totalCount += this->leftChild->countNumPointsWithDotProductBetween(minValue,maxValue,probeDirection);
             totalCount += this->rightChild->countNumPointsWithDotProductBetween(minValue,maxValue,probeDirection);
         }
@@ -148,14 +160,17 @@ void BVTreeNode<TypeOfBV>::getDotProductRange(const Vector &direction, double &m
     this->boundingVolume->getDotProductRangeInVolume(direction,minValue,maxValue);
 }
 
-//
+/**********
+ * BVTree *
+ **********/
+
 template<class TypeOfBV>
-class BVTree
-{
+class BVTree{
 private:
     BVTreeNode<TypeOfBV>* root;
 private:
     void buildTree(std::vector<Vector> points, BVTreeNode<TypeOfBV>* currentNode,int &numNodes);
+    void buildTree(std::vector<Vector>& points, int beginIndex, int endIndex, BVTreeNode<TypeOfBV>* currentNode,int &numNodes);
 
 public:
     BVTree();
@@ -174,10 +189,6 @@ void BVTree<TypeOfBV>::getDotProductRange(const Vector &direction, double &minVa
     if(this->root)
         this->root->getDotProductRange(direction,minValue,maxValue);
 }
-
-/**********
- * BVTree *
- **********/
 
 #include <iostream>
 #include <queue>
@@ -262,8 +273,6 @@ int BVTree<TypeOfBV>::getNumPoints(){
   return this->root->getNumPoints();
 }
 
-#include <typeinfo>
-
 template<class TypeOfBV>
 void BVTree<TypeOfBV>::buildTree(std::vector<Vector> points, BVTreeNode<TypeOfBV> *currentNode, int &numNodes){
     //init node information
@@ -296,6 +305,13 @@ void BVTree<TypeOfBV>::buildTree(std::vector<Vector> points, BVTreeNode<TypeOfBV
     else{
         currentNode->setPoints(points);
     }
+}
+
+template<class TypeOfBV>
+void BVTree<TypeOfBV>::buildTree(std::vector<Vector>& points, int beginIndex, int endIndex, BVTreeNode<TypeOfBV>* currentNode,int &numNodes){
+    this->boundingVolume = new TypeOfBV(points,beginIndex,endIndex);
+    this->numPoints = endIndex - beginIndex;
+    this->points.clear();
 }
 
 void testBVTree();

@@ -40,8 +40,7 @@ Sphere::Sphere(Vector& c,double r):
 }
 
 Sphere::Sphere(std::vector<Vector>& points):
-    directionOfLargestVariance(NULL)
-{
+    directionOfLargestVariance(NULL){
     if(points.size() > 0){
         int numDimensions = points.at(0).getDimension();
         this->center = new Vector(numDimensions);
@@ -49,6 +48,19 @@ Sphere::Sphere(std::vector<Vector>& points):
         //TODO: implement and set the direction of largest variance from points
     }
 }
+
+Sphere::Sphere(std::vector<Vector>& points, int beginIndex, int endIndex):
+    directionOfLargestVariance(NULL){
+    int numPoints = endIndex - beginIndex;
+    if(numPoints > 0){
+        int numDimensions = points.at(beginIndex).getDimension();
+        this->center = new Vector(numDimensions);
+        std::vector<Vector> usedPoints(points.begin() + beginIndex, points.begin() + endIndex);
+        MiniBallComputation::computeMiniBall(points,*center,this->radius);
+        //TODO: implement and set the direction of largest variance from points
+    }
+}
+
 
 Sphere::~Sphere(){
     if(this->center)
@@ -123,6 +135,30 @@ AxisAlignedBoundingVolume::AxisAlignedBoundingVolume(std::vector<Vector> &points
     this->dimensionBounds = vector<pair<double,double> >(numDimensions,initialLimits);
 
     for(int i = 0 ; i < numPoints ; ++i){
+        Vector& point = points.at(i);
+        for(int d = 0 ; d < numDimensions ; ++d){
+            pair<double,double> & dimBounds = this->dimensionBounds.at(d);
+            double value = point[d];
+            if(value < dimBounds.first)
+                dimBounds.first = value;
+            if(value > dimBounds.second)
+                dimBounds.second = value;
+        }
+    }
+}
+
+
+AxisAlignedBoundingVolume::AxisAlignedBoundingVolume(std::vector<Vector>& points, int beginIndex, int endIndex){
+    int numPoints = endIndex - beginIndex;
+    assert(numPoints > 0);
+
+    Vector& firstPoint = points.at(beginIndex);
+    int numDimensions = firstPoint.getDimension();
+    pair<double,double> initialLimits = make_pair(std::numeric_limits<double>::max(),std::numeric_limits<double>::min());
+    //
+    this->dimensionBounds = vector<pair<double,double> >(numDimensions,initialLimits);
+
+    for(int i = beginIndex ; i < endIndex ; ++i){
         Vector& point = points.at(i);
         for(int d = 0 ; d < numDimensions ; ++d){
             pair<double,double> & dimBounds = this->dimensionBounds.at(d);
@@ -338,3 +374,5 @@ void testSphere(){
     cout << "    Center " << center.toString() << endl;
     cout << "    radius " << radius << endl;
 }
+
+
