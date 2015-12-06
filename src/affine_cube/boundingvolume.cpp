@@ -130,7 +130,7 @@ AxisAlignedBoundingVolume::AxisAlignedBoundingVolume(std::vector<Vector> &points
 
     Vector& firstPoint = points.at(0);
     int numDimensions = firstPoint.getDimension();
-    pair<double,double> initialLimits = make_pair(std::numeric_limits<double>::max(),std::numeric_limits<double>::min());
+    pair<double,double> initialLimits = make_pair(std::numeric_limits<double>::max(),-std::numeric_limits<double>::max());
     //
     this->dimensionBounds = vector<pair<double,double> >(numDimensions,initialLimits);
 
@@ -154,7 +154,7 @@ AxisAlignedBoundingVolume::AxisAlignedBoundingVolume(std::vector<Vector>& points
 
     Vector& firstPoint = points.at(beginIndex);
     int numDimensions = firstPoint.getDimension();
-    pair<double,double> initialLimits = make_pair(std::numeric_limits<double>::max(),std::numeric_limits<double>::min());
+    pair<double,double> initialLimits = make_pair(std::numeric_limits<double>::max(),-std::numeric_limits<double>::max());
     //
     this->dimensionBounds = vector<pair<double,double> >(numDimensions,initialLimits);
 
@@ -222,7 +222,7 @@ AxisAlignedBoundingVolume* AxisAlignedBoundingVolume::getAxisAlignedBoundingVolu
 
     Vector& firstPoint = points.at(0);
     int numDimensions = firstPoint.getDimension();
-    pair<double,double> initialLimits = make_pair(std::numeric_limits<double>::max(),std::numeric_limits<double>::min());
+    pair<double,double> initialLimits = make_pair(std::numeric_limits<double>::max(),-std::numeric_limits<double>::max());
     vector<pair<double,double> > bounds(numDimensions,initialLimits);
 
     for(int i = 0 ; i < numPoints ; ++i){
@@ -244,7 +244,7 @@ AxisAlignedBoundingVolume *AxisAlignedBoundingVolume::getAxisAlignedBoundingVolu
     assert(startIndex < endIndex);
     Vector& firstPoint = points.at(startIndex);
     int numDimensions = firstPoint.getDimension();
-    pair<double,double> initialLimits = make_pair(std::numeric_limits<double>::max(),std::numeric_limits<double>::min());
+    pair<double,double> initialLimits = make_pair(std::numeric_limits<double>::max(),-std::numeric_limits<double>::max());
     vector<pair<double,double> > bounds(numDimensions,initialLimits);
 
     for(int i = startIndex ; i < endIndex ; ++i){

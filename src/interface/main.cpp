@@ -19,9 +19,9 @@ int main(int argc, char *argv[])
     double noisePortion = 0.05;
     std::vector<double> dataFractions{noisePortion, 0.5 - noisePortion,0.5 - noisePortion, noisePortion};
 
-    bool needToSplit = numPoints >= 1 / noisePortion;
+    bool needToSplit = true;//numPoints >= 1 / noisePortion;
 
-    int beginIndex = 1;
+    int beginIndex = 0;
     int endIndex = beginIndex + numPoints;
 
     if(needToSplit){

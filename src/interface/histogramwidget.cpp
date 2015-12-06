@@ -87,13 +87,39 @@ HistogramWidget::HistogramWidget(QWidget *parent) : QWidget(parent),
         }
         points.push_back(point);
     }
+
+#elif 1
+    //random data
+    int numDimensions = 2;
+    xAxis = new Vector(numDimensions);
+    yAxis = new Vector(numDimensions);
+    //
+    (*xAxis)[0] = 1.0;
+    //
+    (*yAxis)[1] = 1.0;
+
+    int numPoints = 20;
+    //
+    std::default_random_engine generator;
+    std::normal_distribution<double> distribution(0.0,1.0);
+    //
+    for(int i = 0 ; i < numPoints ; ++i){
+        Vector point(numDimensions);
+        for(int d = 0 ; d < numDimensions ; ++d){
+            double number = distribution(generator);
+            point[d] = number;
+        }
+        cout << "Point " << i << " : " << point.toString() << endl;
+        points.push_back(point);
+    }
+    cout << "================" << endl;
 #endif
 
 
     //
     qDebug() << "building tree";
-    //myTree = new BVTree<BOUNDING_VOLUME_T>(points);
-    myTree = new GeneralBVTree<BOUNDING_VOLUME_T>(points);
+    myTree = new BVTree<BOUNDING_VOLUME_T>(points);
+    //myTree = new GeneralBVTree<BOUNDING_VOLUME_T>(points);
     qDebug() << "done building tree";
 
     myTree->getDotProductRange(*xAxis,minX,maxX);
@@ -140,7 +166,7 @@ void HistogramWidget::paintEvent(QPaintEvent * ){
     }
 
 
-    //qDebug() << "Num Bins " << numbins << result.at(0).count;
+    //qDebug() << "Num Bins " << numbins;
     for(int i = 0 ; i < numbins ; ++i){
         Histogram2DBin bin = result.at(i);
         //cout << "    bin " << i << " " << bin.toString() << endl;
@@ -162,7 +188,7 @@ void HistogramWidget::paintEvent(QPaintEvent * ){
         //cout << "     screen rect: (" << bbox.left() << ", " << bbox.right() << ") X (" << bbox.top() << ", " << bbox.bottom() << ")" <<  endl;
         painter.drawPolygon(screenRect);
     }
-    cout << "=================" << endl;
+    //cout << "=================" << endl;
 
     //
     if(true){
