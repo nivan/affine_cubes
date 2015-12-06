@@ -1,6 +1,9 @@
 #include "histogramwidget.h"
 #include <QPainter>
 #include <cassert>
+#include <random>
+
+std::vector<Vector> points;
 
 HistogramWidget::HistogramWidget(QWidget *parent) : QWidget(parent),
     xAxis(NULL),yAxis(NULL)
@@ -9,7 +12,6 @@ HistogramWidget::HistogramWidget(QWidget *parent) : QWidget(parent),
     //
     this->scale = ColorScaleFactory::getInstance(SEQUENTIAL_SINGLE_HUE_RED);
     this->depth = 0;
-    std::vector<Vector> points;
 
 #if 0
     //random data
@@ -29,7 +31,7 @@ HistogramWidget::HistogramWidget(QWidget *parent) : QWidget(parent),
         }
         points.push_back(point);
     }
-#elif 1
+#elif 0
     int numDimensions = 50;
     xAxis = new Vector(numDimensions);
     yAxis = new Vector(numDimensions);
@@ -44,7 +46,7 @@ HistogramWidget::HistogramWidget(QWidget *parent) : QWidget(parent),
     }
 
     readCSVPoints("../../data/i_band.csv",points);
-#elif 1
+#elif 0
     //random data
     int numDimensions = 2;
     xAxis = new Vector(numDimensions);
@@ -62,6 +64,29 @@ HistogramWidget::HistogramWidget(QWidget *parent) : QWidget(parent),
         }
         points.push_back(point);
     }
+#elif 1
+    //random data
+    int numDimensions = 2;
+    xAxis = new Vector(numDimensions);
+    yAxis = new Vector(numDimensions);
+    //
+    (*xAxis)[0] = 1.0;
+    //
+    (*yAxis)[1] = 1.0;
+
+    int numPoints = 1000;
+    //
+    std::default_random_engine generator;
+    std::normal_distribution<double> distribution(0.0,1.0);
+    //
+    for(int i = 0 ; i < numPoints ; ++i){
+        Vector point(numDimensions);
+        for(int d = 0 ; d < numDimensions ; ++d){
+            double number = distribution(generator);
+            point[d] = number;
+        }
+        points.push_back(point);
+    }
 #endif
 
 
@@ -71,10 +96,10 @@ HistogramWidget::HistogramWidget(QWidget *parent) : QWidget(parent),
     myTree = new GeneralBVTree<BOUNDING_VOLUME_T>(points);
     qDebug() << "done building tree";
 
-//    myTree->getDotProductRange(*xAxis,minX,maxX);
-//    myTree->getDotProductRange(*yAxis,minY,maxY);
-    minX = minY = 0.0;
-    maxX = maxY = 1.0;
+    myTree->getDotProductRange(*xAxis,minX,maxX);
+    myTree->getDotProductRange(*yAxis,minY,maxY);
+    //    minX = minY = 0.0;
+    //    maxX = maxY = 1.0;
 }
 
 HistogramWidget::~HistogramWidget()
@@ -102,12 +127,13 @@ void HistogramWidget::paintEvent(QPaintEvent * ){
     m.scale(width() / (maxX - minX),height() / (maxY - minY));
     m.translate(-minX,-minY);
 
+    //cout << "LIMITS: [" << minX << ", " << maxX << ") X (" << minY << ", " << maxY << ")" << endl;
+
     //
     float maxCount = 0;
     //cout << "  Num Bins " << numbins << endl;
     for(int i = 0 ; i < numbins ; ++i){
         Histogram2DBin bin = result.at(i);
-        //cout << "    bin " << i << " " << bin.toString() << endl;
         if(maxCount < bin.count){
             maxCount = bin.count;
         }
@@ -117,10 +143,40 @@ void HistogramWidget::paintEvent(QPaintEvent * ){
     //qDebug() << "Num Bins " << numbins << result.at(0).count;
     for(int i = 0 ; i < numbins ; ++i){
         Histogram2DBin bin = result.at(i);
+        //cout << "    bin " << i << " " << bin.toString() << endl;
         QColor color = this->scale->getColor(bin.count / maxCount);
+        color.setAlphaF(0.3);
         painter.setBrush(color);
-        QPolygonF screenRect = m.map(QRectF(QPointF(bin.minX,bin.minY),QPointF(bin.maxX,bin.maxY)));
+        QPolygonF screenRect;
+        if(bin.count == 1){
+            //cout << "Found singleton" << endl;
+            QPointF center = m.map(QPointF(bin.minX,bin.minY));
+            int minHalfSize = 3;
+            screenRect = QRectF(center.x() - minHalfSize,center.y() - minHalfSize, 2 * minHalfSize, 2 * minHalfSize);
+        }
+        else{
+            screenRect = m.map(QRectF(QPointF(bin.minX,bin.minY),QPointF(bin.maxX,bin.maxY)));
+
+        }
+        QRectF bbox = screenRect.boundingRect();
+        //cout << "     screen rect: (" << bbox.left() << ", " << bbox.right() << ") X (" << bbox.top() << ", " << bbox.bottom() << ")" <<  endl;
         painter.drawPolygon(screenRect);
+    }
+    cout << "=================" << endl;
+
+    //
+    if(true){
+        QPen pointPen(Qt::blue,3);
+        painter.setPen(pointPen);
+        painter.setBrush(Qt::blue);
+        int numPoints = points.size();
+        for(int i = 0 ; i < numPoints ; ++i){
+            Vector& pt = points.at(i);
+            double x = xAxis->dot(pt);
+            double y = yAxis->dot(pt);
+            QPointF screenPoints = m.map(QPointF(x,y));
+            painter.drawPoint(screenPoints);
+        }
     }
 
 }

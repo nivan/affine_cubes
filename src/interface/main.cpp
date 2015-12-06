@@ -14,19 +14,21 @@ const int SIZE = 7;
 
 int main(int argc, char *argv[])
 {
-
 #if 0
-    int numPoints = 1000;
+    int numPoints = 20;
     double noisePortion = 0.05;
-    std::vector<double> dataFractions{noisePortion, 1.0 - 2*noisePortion, noisePortion};
+    std::vector<double> dataFractions{noisePortion, 0.5 - noisePortion,0.5 - noisePortion, noisePortion};
 
     bool needToSplit = numPoints >= 1 / noisePortion;
+
+    int beginIndex = 1;
+    int endIndex = beginIndex + numPoints;
 
     if(needToSplit){
 
         double accumSum = 0;
         int prevStart = 0;
-        int numChildren = 3;
+        int numChildren = 4;
 
         for(int i = 0 ; i < numChildren ; ++i){
             //
@@ -37,19 +39,25 @@ int main(int argc, char *argv[])
                 childEndIndex = numPoints;
             prevStart = childEndIndex;
 
-            cout << "node " << i << " : " << childBeginIndex << " , " << childEndIndex << endl;
+            cout << "node " << i << " : " << (childBeginIndex + beginIndex) << " , " << (childEndIndex+beginIndex) << endl;
         }
 
     }
 
 
-    testGeneralTree();
+//    testGeneralTree();
     //    testBVTree();
 
     return 0;
-#else
+#elif 1
     QApplication a(argc, argv);
     Widget w;
+    w.show();
+
+    return a.exec();
+#elif 1
+    QApplication a(argc, argv);
+    GLHistogramWidget w;
     w.show();
 
     return a.exec();

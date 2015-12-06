@@ -205,13 +205,11 @@ HyperPlane AxisAlignedBoundingVolume::getHyperPlane(int i){
 
 string AxisAlignedBoundingVolume::toString(){
     stringstream ss;
-    int numPlanes = this->numPlanes();
-    ss << "Number of bounding planes " <<  numPlanes << endl;
-    for(int i = 0 ; i < numPlanes ; ++i){
-        HyperPlane plane = this->getHyperPlane(i);
-        ss << "Hyper plane " << i << endl;
-        ss << "   " << plane.normalVector.toString() << endl;
-        ss << "   " << plane.intercept << endl;
+    int numDimensions = this->dimensionBounds.size();
+    ss << "Axis Aligned BV dim = " << numDimensions << " : ";
+    for(int i = 0 ; i < numDimensions ; ++i){
+        pair<double,double> myLimits = this->dimensionBounds.at(i);
+        ss << "[" << myLimits.first << ", " << myLimits.second << "] X ";
 
     }
 

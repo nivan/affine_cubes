@@ -7,4 +7,7 @@
 void sortByDotProduct(std::vector<Vector>& points, Vector *direction);
 void sortPortionByDotProduct(std::vector<Vector>& points, int beginIndex, int endIndex, Vector *direction);
 
+//
+void testAuxFunctions();
+
 #endif // AUXFUNCTIONS_H
