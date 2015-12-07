@@ -5,9 +5,10 @@
 #include "../affine_cube/bvtree.h"
 #include "glhistogramwidget.h"
 #include "../affine_cube/generalbvtree.h"
-
 #include <iostream>
 
+#include <eigen3/Eigen/Dense>
+using namespace Eigen;
 using namespace std;
 
 const int SIZE = 7;
@@ -15,6 +16,22 @@ const int SIZE = 7;
 int main(int argc, char *argv[])
 {
 #if 0
+    //testAuxFunctions();
+testBoundingVolume();
+    //    testGeneralTree();
+        //    testBVTree();
+
+#elif 0
+    VectorXd v(3);
+    v << 1, 2, 3;
+
+    cout << "V size " << v.size() << endl;
+    VectorXd w(v);
+    cout << "w * v =" << endl << w.dot(v) << endl;
+    cout << v[0] << "," << v[1] << "," << v[2] << endl;
+    cout << w[0] << "," << w[1] << "," << w[2] << endl;
+    MatrixXd m = MatrixXd::Random(3,3);
+#elif 0
     int numPoints = 20;
     double noisePortion = 0.05;
     std::vector<double> dataFractions{noisePortion, 0.5 - noisePortion,0.5 - noisePortion, noisePortion};
@@ -43,10 +60,6 @@ int main(int argc, char *argv[])
         }
 
     }
-
-
-//    testGeneralTree();
-    //    testBVTree();
 
     return 0;
 #elif 1

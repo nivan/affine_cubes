@@ -14,7 +14,7 @@ TEMPLATE = app
 
 SOURCES += main.cpp\
         widget.cpp \
-    ../affine_cube/Vector.cpp \
+    #../affine_cube/Vector.cpp \
     ../affine_cube/boundingvolume.cpp \
     ../affine_cube/bvtree.cpp \
     histogramwidget.cpp \
@@ -40,10 +40,10 @@ SOURCES += main.cpp\
     ../affine_cube/auxfunctions.cpp \
     ../affine_cube/histogram2dbin.cpp \
     ../affine_cube/generalbvtree.cpp \
-    scatterplotwidget.cpp
+    scatterplotwidget.cpp \
 
 HEADERS  += widget.h \
-    ../affine_cube/Vector.h \
+    #../affine_cube/Vector.h \
     ../affine_cube/boundingvolume.h \
     ../affine_cube/bvtree.h \
     histogramwidget.h \
@@ -75,7 +75,8 @@ HEADERS  += widget.h \
     ../affine_cube/auxfunctions.h \
     ../affine_cube/histogram2dbin.h \
     ../affine_cube/generalbvtree.h \
-    scatterplotwidget.h
+    scatterplotwidget.h \
+
 
 FORMS    += widget.ui
 

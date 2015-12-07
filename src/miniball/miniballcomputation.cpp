@@ -21,20 +21,20 @@ MiniBallComputation::~MiniBallComputation()
 
 }
 
-void MiniBallComputation::computeMiniBall(std::vector<Vector> &points, Vector &center, double& radius){
+void MiniBallComputation::computeMiniBall(std::vector<Eigen::VectorXd> &points, Eigen::VectorXd &center, double& radius){
     //
     int numPoints = points.size();
 
     assert(points.size() > 0);
 
-    int dimension = points.at(0).getDimension();
+    int dimension = points.at(0).size();
 
-    assert(center.getDimension() == dimension);
+    assert(center.size() == dimension);
 
     // Construct n random points in dimension d
     PointVector S;
     for (int i=0; i<numPoints; ++i) {
-        Vector& vec = points.at(i);
+        Eigen::VectorXd& vec = points.at(i);
         Point pt(dimension);
         for(int d = 0 ; d < dimension ; ++d){
             pt[d] = vec[d];

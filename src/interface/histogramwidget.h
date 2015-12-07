@@ -9,7 +9,7 @@
 //#define BOUNDING_VOLUME_T Sphere
 #define BOUNDING_VOLUME_T AxisAlignedBoundingVolume
 
-void readCSVPoints(QString filename,std::vector<Vector>& points);
+void readCSVPoints(QString filename,std::vector<Eigen::VectorXd>& points);
 
 class HistogramWidget : public QWidget
 {
@@ -28,8 +28,8 @@ private:
     double maxY;
     ColorScale* scale;
 private:
-    Vector* xAxis;
-    Vector* yAxis;
+    Eigen::VectorXd* xAxis;
+    Eigen::VectorXd* yAxis;
 private:
     bool showPoints;
     bool showBins;

@@ -3,7 +3,7 @@
 #include <cassert>
 #include <random>
 
-std::vector<Vector> points;
+std::vector<Eigen::VectorXd> points;
 
 HistogramWidget::HistogramWidget(QWidget *parent) : QWidget(parent),
     xAxis(NULL),yAxis(NULL),showPoints(true),showBins(true), pointsAlpha(1.0)
@@ -16,8 +16,8 @@ HistogramWidget::HistogramWidget(QWidget *parent) : QWidget(parent),
 #if 0
     //random data
     int numDimensions = 4;
-    xAxis = new Vector(numDimensions);
-    yAxis = new Vector(numDimensions);
+    xAxis = new Eigen::VectorXd(Eigen::VectorXd::Zero(numDimensions));
+    yAxis = new Eigen::VectorXd(Eigen::VectorXd::Zero(numDimensions));
     //
     (*xAxis)[0] = 1.0;
     //
@@ -25,7 +25,7 @@ HistogramWidget::HistogramWidget(QWidget *parent) : QWidget(parent),
 
     int numPoints = 1000;
     for(int i = 0 ; i < numPoints ; ++i){
-        Vector point(numDimensions);
+        Eigen::VectorXd point(numDimensions);
         for(int d = 0 ; d < numDimensions ; ++d){
             point[d] = (rand() * 1.0) / RAND_MAX;
         }
@@ -33,8 +33,8 @@ HistogramWidget::HistogramWidget(QWidget *parent) : QWidget(parent),
     }
 #elif 0
     int numDimensions = 50;
-    xAxis = new Vector(numDimensions);
-    yAxis = new Vector(numDimensions);
+    xAxis = new Eigen::VectorXd(Eigen::VectorXd::Zero(numDimensions));
+    yAxis = new Eigen::VectorXd(Eigen::VectorXd::Zero(numDimensions));
 
     //test data from file
     double weights1[] = {-0.25504687, 0.18069224, 0.1844671 , 0.17998339, 0.1802003 , 0.18041489, 0.18067747, 0.18090149, 0.18115207, 0.17661623, 0.16695162, 0.15727139, 0.14759242, 0.13790725, 0.12803831, 0.11821229, 0.10829935, 0.09838501, 0.08841584, 0.07843253, 0.06835597, 0.05828226, 0.04821307, 0.03788746, 0.02672559, 0.01472539, 0.00423005, -0.0062836 , -0.01702462, -0.02799306, -0.03904066, -0.05036745, -0.0611769 , -0.07142132, -0.08215804, -0.09285149, -0.10352378, -0.11420251, -0.12470873, -0.13543912, -0.14567545, -0.15577893, -0.16604223, -0.17625254, -0.18710215, -0.19956397, -0.21119001, -0.22317638, -0.22693173, -0.24007948};
@@ -46,19 +46,19 @@ HistogramWidget::HistogramWidget(QWidget *parent) : QWidget(parent),
     }
 
     readCSVPoints("../../data/i_band.csv",points);
-#elif 1
+#elif 0
     //random data
     int numDimensions = 2;
-    xAxis = new Vector(numDimensions);
-    yAxis = new Vector(numDimensions);
+    xAxis = new Eigen::VectorXd(Eigen::VectorXd::Zero(numDimensions));
+    yAxis = new Eigen::VectorXd(Eigen::VectorXd::Zero(numDimensions));
     //
     (*xAxis)[0] = 1.0;
     //
     (*yAxis)[1] = 1.0;
 
-    int numPoints = 1000;
+    int numPoints = 10000;
     for(int i = 0 ; i < numPoints ; ++i){
-        Vector point(numDimensions);
+        Eigen::VectorXd point(numDimensions);
         for(int d = 0 ; d < numDimensions ; ++d){
             point[d] = (rand() * 1.0) / RAND_MAX;
         }
@@ -67,8 +67,8 @@ HistogramWidget::HistogramWidget(QWidget *parent) : QWidget(parent),
 #elif 1
     //one gaussian
     int numDimensions = 2;
-    xAxis = new Vector(numDimensions);
-    yAxis = new Vector(numDimensions);
+    xAxis = new Eigen::VectorXd(Eigen::VectorXd::Zero(numDimensions));
+    yAxis = new Eigen::VectorXd(Eigen::VectorXd::Zero(numDimensions));
     //
     (*xAxis)[0] = 1.0;
     //
@@ -91,7 +91,7 @@ HistogramWidget::HistogramWidget(QWidget *parent) : QWidget(parent),
 
     //
     for(int i = 0 ; i < numPoints ; ++i){
-        Vector point(numDimensions);
+        Eigen::VectorXd point(numDimensions);
         for(int d = 0 ; d < numDimensions ; ++d){
             std::normal_distribution<double>& distribution = distributions.at(rand() % numDistributions);
             double number = distribution(generator);
@@ -102,8 +102,8 @@ HistogramWidget::HistogramWidget(QWidget *parent) : QWidget(parent),
 #elif 1
     //one gaussian
     int numDimensions = 10;
-    xAxis = new Vector(numDimensions);
-    yAxis = new Vector(numDimensions);
+    xAxis = new Eigen::VectorXd(Eigen::VectorXd::Zero(numDimensions));
+    yAxis = new Eigen::VectorXd(Eigen::VectorXd::Zero(numDimensions));
     //
     (*xAxis)[0] = 1.0;
     (*xAxis)[2] = 1.0;
@@ -116,7 +116,7 @@ HistogramWidget::HistogramWidget(QWidget *parent) : QWidget(parent),
     std::normal_distribution<double> distribution(0.0,1.0);
     //
     for(int i = 0 ; i < numPoints ; ++i){
-        Vector point(numDimensions);
+        Eigen::VectorXd point(numDimensions);
         for(int d = 0 ; d < numDimensions ; ++d){
             double number = distribution(generator);
             point[d] = number;
@@ -126,8 +126,8 @@ HistogramWidget::HistogramWidget(QWidget *parent) : QWidget(parent),
 #elif 1
     //random data
     int numDimensions = 2;
-    xAxis = new Vector(numDimensions);
-    yAxis = new Vector(numDimensions);
+    xAxis = new Eigen::VectorXd(Eigen::VectorXd::Zero(numDimensions));
+    yAxis = new Eigen::VectorXd(Eigen::VectorXd::Zero(numDimensions));
     //
     (*xAxis)[0] = 1.0;
     //
@@ -139,7 +139,7 @@ HistogramWidget::HistogramWidget(QWidget *parent) : QWidget(parent),
     std::normal_distribution<double> distribution(0.0,1.0);
     //
     for(int i = 0 ; i < numPoints ; ++i){
-        Vector point(numDimensions);
+        Eigen::VectorXd point(numDimensions);
         for(int d = 0 ; d < numDimensions ; ++d){
             double number = distribution(generator);
             point[d] = number;
@@ -244,7 +244,7 @@ void HistogramWidget::paintEvent(QPaintEvent * ){
         painter.setPen(pointPen);
         int numPoints = points.size();
         for(int i = 0 ; i < numPoints ; ++i){
-            Vector& pt = points.at(i);
+            Eigen::VectorXd& pt = points.at(i);
             double x = xAxis->dot(pt);
             double y = yAxis->dot(pt);
             QPointF screenPoints = m.map(QPointF(x,y));
@@ -276,7 +276,7 @@ void HistogramWidget::setPtsAlpha(int i){
 
 
 
-void readCSVPoints(QString filename,std::vector<Vector>& points){
+void readCSVPoints(QString filename,std::vector<Eigen::VectorXd>& points){
     points.clear();
 
     QFile file(filename);
@@ -290,7 +290,7 @@ void readCSVPoints(QString filename,std::vector<Vector>& points){
         QString line = file.readLine();
         QStringList tokens = line.split(",");
         int numDimensions = tokens.size();
-        Vector point(numDimensions);
+        Eigen::VectorXd point(numDimensions);
         for(int i = 0 ; i < numDimensions ; ++i){
             bool ok = false;
             point[i] = tokens[i].toDouble(&ok);

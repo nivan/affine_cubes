@@ -18,18 +18,18 @@ private:
     BoundingVolume* boundingVolume;
     int             beginIndex;
     int             endIndex;
-    std::vector<Vector> points;
+    std::vector<Eigen::VectorXd> points;
 public:
     BVTreeNode();
-    BVTreeNode(std::vector<Vector>& points);
-    void init(std::vector<Vector>& points);
-    //void init(std::vector<Vector>& points, int startIndex, int endIndex);
+    BVTreeNode(std::vector<Eigen::VectorXd>& points);
+    void init(std::vector<Eigen::VectorXd>& points);
+    //void init(std::vector<Eigen::VectorXd>& points, int startIndex, int endIndex);
     ~BVTreeNode();
 public:
     BoundingVolume* getBoundingVolume();
     void setLeftChild(BVTreeNode*);
     void setRightChild(BVTreeNode*);
-    void setPoints(std::vector<Vector>& points);
+    void setPoints(std::vector<Eigen::VectorXd>& points);
     bool isLeaf();
 
     int  getNumPoints();
@@ -37,8 +37,8 @@ public:
     BVTreeNode* getRightChild();
 public:
 
-    int countNumPointsWithDotProductBetween(double minValue,double maxValue, Vector& probeDirection);
-    void getDotProductRange(const Vector& direction, double &minValue, double& maxValue);
+    int countNumPointsWithDotProductBetween(double minValue,double maxValue, Eigen::VectorXd& probeDirection);
+    void getDotProductRange(const Eigen::VectorXd& direction, double &minValue, double& maxValue);
 };
 
 template<class TypeOfBV>
@@ -51,7 +51,7 @@ BVTreeNode<TypeOfBV>::BVTreeNode():
 {}
 
 template<class TypeOfBV>
-BVTreeNode<TypeOfBV>::BVTreeNode(std::vector<Vector>& points):
+BVTreeNode<TypeOfBV>::BVTreeNode(std::vector<Eigen::VectorXd>& points):
     leftChild(NULL),
     rightChild(NULL),
     boundingVolume(NULL){
@@ -59,7 +59,7 @@ BVTreeNode<TypeOfBV>::BVTreeNode(std::vector<Vector>& points):
 }
 
 template<class TypeOfBV>
-void BVTreeNode<TypeOfBV>::init(std::vector<Vector>& points){
+void BVTreeNode<TypeOfBV>::init(std::vector<Eigen::VectorXd>& points){
     this->boundingVolume = new TypeOfBV(points);
     this->beginIndex = 0;
     this->endIndex = points.size();
@@ -92,7 +92,7 @@ void BVTreeNode<TypeOfBV>::setRightChild(BVTreeNode* n){
 }
 
 template<class TypeOfBV>
-void BVTreeNode<TypeOfBV>::setPoints(std::vector<Vector> &points){
+void BVTreeNode<TypeOfBV>::setPoints(std::vector<Eigen::VectorXd> &points){
     this->points = points;
 }
 
@@ -119,7 +119,7 @@ BVTreeNode<TypeOfBV>* BVTreeNode<TypeOfBV>::getRightChild(){
 }
 
 template<class TypeOfBV>
-int BVTreeNode<TypeOfBV>::countNumPointsWithDotProductBetween(double minValue, double maxValue, Vector &probeDirection){
+int BVTreeNode<TypeOfBV>::countNumPointsWithDotProductBetween(double minValue, double maxValue, Eigen::VectorXd &probeDirection){
     double minDotProductInBV;
     double maxDotProductInBV;
     this->boundingVolume->getDotProductRangeInVolume(probeDirection,minDotProductInBV,maxDotProductInBV);
@@ -145,7 +145,7 @@ int BVTreeNode<TypeOfBV>::countNumPointsWithDotProductBetween(double minValue, d
             //assert(false);
             int numPoints = this->points.size();
             for(int i = 0 ; i < numPoints ; ++i){
-                Vector& v = this->points.at(i);
+                Eigen::VectorXd& v = this->points.at(i);
                 double value = probeDirection.dot(v);
                 if(minValue <= value && value <= maxValue)
                     totalCount += 1;
@@ -156,7 +156,7 @@ int BVTreeNode<TypeOfBV>::countNumPointsWithDotProductBetween(double minValue, d
 }
 
 template<class TypeOfBV>
-void BVTreeNode<TypeOfBV>::getDotProductRange(const Vector &direction, double &minValue, double &maxValue){
+void BVTreeNode<TypeOfBV>::getDotProductRange(const Eigen::VectorXd &direction, double &minValue, double &maxValue){
     this->boundingVolume->getDotProductRangeInVolume(direction,minValue,maxValue);
 }
 
@@ -169,23 +169,23 @@ class BVTree{
 private:
     BVTreeNode<TypeOfBV>* root;
 private:
-    void buildTree(std::vector<Vector> points, BVTreeNode<TypeOfBV>* currentNode,int &numNodes);
-    void buildTree(std::vector<Vector>& points, int beginIndex, int endIndex, BVTreeNode<TypeOfBV>* currentNode,int &numNodes);
+    void buildTree(std::vector<Eigen::VectorXd> points, BVTreeNode<TypeOfBV>* currentNode,int &numNodes);
+    void buildTree(std::vector<Eigen::VectorXd>& points, int beginIndex, int endIndex, BVTreeNode<TypeOfBV>* currentNode,int &numNodes);
 
 public:
     BVTree();
-    BVTree(std::vector<Vector>& points);
+    BVTree(std::vector<Eigen::VectorXd>& points);
     ~BVTree();
 public:
-    int countNumNodesWithDotProductBetween(double minValue,double maxValue, Vector& probeDirection);
-    void getUnbinnedHistogram(const Vector& xAxis, const Vector& yAxis, int maxDepth, std::vector<Histogram2DBin>& result);
-    void getDotProductRange(const Vector& direction, double &minValue, double& maxValue);
+    int countNumNodesWithDotProductBetween(double minValue,double maxValue, Eigen::VectorXd& probeDirection);
+    void getUnbinnedHistogram(const Eigen::VectorXd& xAxis, const Eigen::VectorXd& yAxis, int maxDepth, std::vector<Histogram2DBin>& result);
+    void getDotProductRange(const Eigen::VectorXd& direction, double &minValue, double& maxValue);
     int  getNumPoints();
 };
 
 
 template<class TypeOfBV>
-void BVTree<TypeOfBV>::getDotProductRange(const Vector &direction, double &minValue, double &maxValue){
+void BVTree<TypeOfBV>::getDotProductRange(const Eigen::VectorXd &direction, double &minValue, double &maxValue){
     if(this->root)
         this->root->getDotProductRange(direction,minValue,maxValue);
 }
@@ -202,7 +202,7 @@ BVTree<TypeOfBV>::BVTree():
 {}
 
 template<class TypeOfBV>
-BVTree<TypeOfBV>::BVTree(std::vector<Vector>& points):
+BVTree<TypeOfBV>::BVTree(std::vector<Eigen::VectorXd>& points):
     root(NULL){
     this->root = new BVTreeNode<TypeOfBV>(points);
     int numNodesGenerated = 0;
@@ -217,7 +217,7 @@ BVTree<TypeOfBV>::~BVTree(){
 }
 
 template<class TypeOfBV>
-int BVTree<TypeOfBV>::countNumNodesWithDotProductBetween(double minValue, double maxValue, Vector &probeDirection){
+int BVTree<TypeOfBV>::countNumNodesWithDotProductBetween(double minValue, double maxValue, Eigen::VectorXd &probeDirection){
     if(this->root)
         return this->root->countNumPointsWithDotProductBetween(minValue,maxValue,probeDirection);
     else
@@ -225,7 +225,7 @@ int BVTree<TypeOfBV>::countNumNodesWithDotProductBetween(double minValue, double
 }
 
 template<class TypeOfBV>
-void BVTree<TypeOfBV>::getUnbinnedHistogram(const Vector &xAxis, const Vector &yAxis, int maxDepth, std::vector<Histogram2DBin> &result){
+void BVTree<TypeOfBV>::getUnbinnedHistogram(const Eigen::VectorXd &xAxis, const Eigen::VectorXd &yAxis, int maxDepth, std::vector<Histogram2DBin> &result){
     std::queue<std::pair<int,BVTreeNode<TypeOfBV>*> > nodes;
     nodes.push(std::make_pair(0,this->root));
     while(!nodes.empty()){
@@ -274,7 +274,7 @@ int BVTree<TypeOfBV>::getNumPoints(){
 }
 
 template<class TypeOfBV>
-void BVTree<TypeOfBV>::buildTree(std::vector<Vector> points, BVTreeNode<TypeOfBV> *currentNode, int &numNodes){
+void BVTree<TypeOfBV>::buildTree(std::vector<Eigen::VectorXd> points, BVTreeNode<TypeOfBV> *currentNode, int &numNodes){
     //init node information
     currentNode->init(points);
     numNodes += 1;
@@ -284,13 +284,13 @@ void BVTree<TypeOfBV>::buildTree(std::vector<Vector> points, BVTreeNode<TypeOfBV
 
     if(needToSplit){
         //get direction to split
-        Vector direction = currentNode->getBoundingVolume()->getDirectionOfLargestVariance();
+        Eigen::VectorXd direction = currentNode->getBoundingVolume()->getDirectionOfLargestVariance();
         sortByDotProduct(points,&direction);
         int midIndex = numPoints / 2;
 
         //
-        std::vector<Vector> leftPoints;
-        std::vector<Vector> rightPoints;
+        std::vector<Eigen::VectorXd> leftPoints;
+        std::vector<Eigen::VectorXd> rightPoints;
         partitionVector(points,midIndex,leftPoints,rightPoints);
 
         //
@@ -308,7 +308,7 @@ void BVTree<TypeOfBV>::buildTree(std::vector<Vector> points, BVTreeNode<TypeOfBV
 }
 
 template<class TypeOfBV>
-void BVTree<TypeOfBV>::buildTree(std::vector<Vector>& points, int beginIndex, int endIndex, BVTreeNode<TypeOfBV>* currentNode,int &numNodes){
+void BVTree<TypeOfBV>::buildTree(std::vector<Eigen::VectorXd>& points, int beginIndex, int endIndex, BVTreeNode<TypeOfBV>* currentNode,int &numNodes){
     this->boundingVolume = new TypeOfBV(points,beginIndex,endIndex);
     this->numPoints = endIndex - beginIndex;
     this->points.clear();

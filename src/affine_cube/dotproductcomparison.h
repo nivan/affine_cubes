@@ -1,14 +1,15 @@
 #ifndef DOTPRODUCTCOMPARISON_H
 #define DOTPRODUCTCOMPARISON_H
 
-#include "Vector.h"
+#include <eigen3/Eigen/Dense>
+//#include "Vector.h"
 
 struct DotProductComparison {
 private:
-    Vector* v;
+    Eigen::VectorXd* v;
 public:
-  DotProductComparison(Vector* v);
-  bool operator() (const Vector& v1,const Vector& v2);
+  DotProductComparison(Eigen::VectorXd* v);
+  bool operator() (const Eigen::VectorXd& v1,const Eigen::VectorXd& v2);
 };
 
 #endif // DOTPRODUCTCOMPARISON_H

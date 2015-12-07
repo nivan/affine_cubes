@@ -2,7 +2,8 @@
 #define MINIBALLCOMPUTATION_H
 
 #include <vector>
-#include "../affine_cube/Vector.h"
+#include <eigen3/Eigen/Dense>
+
 
 class MiniBallComputation
 {
@@ -10,7 +11,7 @@ public:
     MiniBallComputation();
     ~MiniBallComputation();
 public:
-    static void computeMiniBall(std::vector<Vector>& points,Vector& center, double& radius);
+    static void computeMiniBall(std::vector<Eigen::VectorXd>& points,Eigen::VectorXd& center, double& radius);
 };
 
 #endif // MINIBALLCOMPUTATION_H

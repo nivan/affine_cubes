@@ -4,6 +4,7 @@
 #include <sstream>
 #include <limits>
 #include "../miniball/miniballcomputation.h"
+#include "auxfunctions.h"
 
 using namespace std;
 
@@ -15,12 +16,12 @@ using namespace std;
 HyperPlane::HyperPlane()
 {}
 
-HyperPlane::HyperPlane(Vector &normalVector, double &intercept):
+HyperPlane::HyperPlane(Eigen::VectorXd &normalVector, double &intercept):
     normalVector(normalVector), intercept(intercept)
 {}
 
 int HyperPlane::numDimensions(){
-    return this->normalVector.getDimension();
+    return this->normalVector.size();
 }
 
 /**********
@@ -33,29 +34,29 @@ Sphere::Sphere():
     directionOfLargestVariance(NULL)
 {}
 
-Sphere::Sphere(Vector& c,double r):
+Sphere::Sphere(Eigen::VectorXd& c,double r):
     directionOfLargestVariance(NULL){
-    this->center = new Vector(c);
+    this->center = new Eigen::VectorXd(c);
     this->radius = r;
 }
 
-Sphere::Sphere(std::vector<Vector>& points):
+Sphere::Sphere(std::vector<Eigen::VectorXd>& points):
     directionOfLargestVariance(NULL){
     if(points.size() > 0){
-        int numDimensions = points.at(0).getDimension();
-        this->center = new Vector(numDimensions);
+        int numDimensions = points.at(0).size();
+        this->center = new Eigen::VectorXd(Eigen::VectorXd::Zero(numDimensions));
         MiniBallComputation::computeMiniBall(points,*center,this->radius);
         //TODO: implement and set the direction of largest variance from points
     }
 }
 
-Sphere::Sphere(std::vector<Vector>& points, int beginIndex, int endIndex):
+Sphere::Sphere(std::vector<Eigen::VectorXd>& points, int beginIndex, int endIndex):
     directionOfLargestVariance(NULL){
     int numPoints = endIndex - beginIndex;
     if(numPoints > 0){
-        int numDimensions = points.at(beginIndex).getDimension();
-        this->center = new Vector(numDimensions);
-        std::vector<Vector> usedPoints(points.begin() + beginIndex, points.begin() + endIndex);
+        int numDimensions = points.at(beginIndex).size();//getDimension();
+        this->center = new Eigen::VectorXd(Eigen::VectorXd::Zero(numDimensions));
+        std::vector<Eigen::VectorXd> usedPoints(points.begin() + beginIndex, points.begin() + endIndex);
         MiniBallComputation::computeMiniBall(points,*center,this->radius);
         //TODO: implement and set the direction of largest variance from points
     }
@@ -70,14 +71,14 @@ Sphere::~Sphere(){
 string Sphere::toString(){
     stringstream ss;
     if(this->center)
-        ss << "Sphere Center " << this->center->toString() << " radius " << this->radius;
+        ss << "Sphere Center " << vecToString(*center) << " radius " << this->radius;
     else
         ss << "Sphere Center NULL radius "  << this->radius;
 
     return ss.str();
 }
 
-Vector Sphere::getCenter(){
+Eigen::VectorXd Sphere::getCenter(){
     return *this->center;
 }
 
@@ -85,32 +86,32 @@ double Sphere::gerRadius(){
     return this->radius;
 }
 
-bool Sphere::contains(const Vector& point){
+bool Sphere::contains(const Eigen::VectorXd& point){
     if(!this->center)
         return false;
 
-    Vector x = (*center) - point;
-    return ( x.length2() <= (radius * radius) );
+    Eigen::VectorXd x = (*center) - point;
+    return ( x.squaredNorm() <= (radius * radius) );
 }
 
-void Sphere::getDotProductRangeInVolume(const Vector& direction, double& minV, double& maxV){
+void Sphere::getDotProductRangeInVolume(const Eigen::VectorXd& direction, double& minV, double& maxV){
     double centerProduct = this->center->dot(direction);
-    double vNorm = direction.length();
+    double vNorm = direction.norm();
     //
     minV = centerProduct - this->radius * vNorm;
     maxV = centerProduct + this->radius * vNorm;
 }
 
-Vector Sphere::getDirectionOfLargestVariance(){
+Eigen::VectorXd Sphere::getDirectionOfLargestVariance(){
     if(this->directionOfLargestVariance){
         return *directionOfLargestVariance;
     }
     else{
         //return random axis aligned direction
         assert(this->center);
-        int numDimensions = this->center->getDimension();
+        int numDimensions = this->center->size();
         int axis = rand() % numDimensions;
-        Vector dir(numDimensions);
+        Eigen::VectorXd dir(numDimensions);
         dir[axis] = 1.0;
         return dir;
     }
@@ -124,18 +125,18 @@ AxisAlignedBoundingVolume::AxisAlignedBoundingVolume(std::vector<std::pair<doubl
     dimensionBounds(dimensionBounds)
 {}
 
-AxisAlignedBoundingVolume::AxisAlignedBoundingVolume(std::vector<Vector> &points){
+AxisAlignedBoundingVolume::AxisAlignedBoundingVolume(std::vector<Eigen::VectorXd> &points){
     int numPoints = points.size();
     assert(numPoints > 0);
 
-    Vector& firstPoint = points.at(0);
-    int numDimensions = firstPoint.getDimension();
+    Eigen::VectorXd& firstPoint = points.at(0);
+    int numDimensions = firstPoint.size();
     pair<double,double> initialLimits = make_pair(std::numeric_limits<double>::max(),-std::numeric_limits<double>::max());
     //
     this->dimensionBounds = vector<pair<double,double> >(numDimensions,initialLimits);
 
     for(int i = 0 ; i < numPoints ; ++i){
-        Vector& point = points.at(i);
+        Eigen::VectorXd& point = points.at(i);
         for(int d = 0 ; d < numDimensions ; ++d){
             pair<double,double> & dimBounds = this->dimensionBounds.at(d);
             double value = point[d];
@@ -148,18 +149,18 @@ AxisAlignedBoundingVolume::AxisAlignedBoundingVolume(std::vector<Vector> &points
 }
 
 
-AxisAlignedBoundingVolume::AxisAlignedBoundingVolume(std::vector<Vector>& points, int beginIndex, int endIndex){
+AxisAlignedBoundingVolume::AxisAlignedBoundingVolume(std::vector<Eigen::VectorXd>& points, int beginIndex, int endIndex){
     int numPoints = endIndex - beginIndex;
     assert(numPoints > 0);
 
-    Vector& firstPoint = points.at(beginIndex);
-    int numDimensions = firstPoint.getDimension();
+    Eigen::VectorXd& firstPoint = points.at(beginIndex);
+    int numDimensions = firstPoint.size();
     pair<double,double> initialLimits = make_pair(std::numeric_limits<double>::max(),-std::numeric_limits<double>::max());
     //
     this->dimensionBounds = vector<pair<double,double> >(numDimensions,initialLimits);
 
     for(int i = beginIndex ; i < endIndex ; ++i){
-        Vector& point = points.at(i);
+        Eigen::VectorXd& point = points.at(i);
         for(int d = 0 ; d < numDimensions ; ++d){
             pair<double,double> & dimBounds = this->dimensionBounds.at(d);
             double value = point[d];
@@ -189,7 +190,7 @@ HyperPlane AxisAlignedBoundingVolume::getHyperPlane(int i){
         coeff = -1.0;
 
 
-    Vector normalVector(numDimensions);
+    Eigen::VectorXd normalVector = Eigen::VectorXd::Zero(numDimensions);
     normalVector[dimensionIndex] = coeff;
 
     //
@@ -216,17 +217,17 @@ string AxisAlignedBoundingVolume::toString(){
     return ss.str();
 }
 
-AxisAlignedBoundingVolume* AxisAlignedBoundingVolume::getAxisAlignedBoundingVolume(std::vector<Vector>& points){
+AxisAlignedBoundingVolume* AxisAlignedBoundingVolume::getAxisAlignedBoundingVolume(std::vector<Eigen::VectorXd>& points){
     int numPoints = points.size();
     assert(numPoints > 0);
 
-    Vector& firstPoint = points.at(0);
-    int numDimensions = firstPoint.getDimension();
+    Eigen::VectorXd& firstPoint = points.at(0);
+    int numDimensions = firstPoint.size();
     pair<double,double> initialLimits = make_pair(std::numeric_limits<double>::max(),-std::numeric_limits<double>::max());
     vector<pair<double,double> > bounds(numDimensions,initialLimits);
 
     for(int i = 0 ; i < numPoints ; ++i){
-        Vector& point = points.at(i);
+        Eigen::VectorXd& point = points.at(i);
         for(int d = 0 ; d < numDimensions ; ++d){
             pair<double,double> & dimBounds = bounds.at(d);
             double value = point[d];
@@ -240,15 +241,15 @@ AxisAlignedBoundingVolume* AxisAlignedBoundingVolume::getAxisAlignedBoundingVolu
     return new AxisAlignedBoundingVolume(bounds);
 }
 
-AxisAlignedBoundingVolume *AxisAlignedBoundingVolume::getAxisAlignedBoundingVolume(std::vector<Vector> &points, int startIndex, int endIndex){
+AxisAlignedBoundingVolume *AxisAlignedBoundingVolume::getAxisAlignedBoundingVolume(std::vector<Eigen::VectorXd> &points, int startIndex, int endIndex){
     assert(startIndex < endIndex);
-    Vector& firstPoint = points.at(startIndex);
-    int numDimensions = firstPoint.getDimension();
+    Eigen::VectorXd& firstPoint = points.at(startIndex);
+    int numDimensions = firstPoint.size();
     pair<double,double> initialLimits = make_pair(std::numeric_limits<double>::max(),-std::numeric_limits<double>::max());
     vector<pair<double,double> > bounds(numDimensions,initialLimits);
 
     for(int i = startIndex ; i < endIndex ; ++i){
-        Vector& point = points.at(i);
+        Eigen::VectorXd& point = points.at(i);
         for(int d = 0 ; d < numDimensions ; ++d){
             pair<double,double> & dimBounds = bounds.at(d);
             double value = point[d];
@@ -263,9 +264,9 @@ AxisAlignedBoundingVolume *AxisAlignedBoundingVolume::getAxisAlignedBoundingVolu
 }
 
 
-void AxisAlignedBoundingVolume::getDotProductRangeInVolume(const Vector& direction,double& minDotProduct,double& maxDotProduct){
+void AxisAlignedBoundingVolume::getDotProductRangeInVolume(const Eigen::VectorXd& direction,double& minDotProduct,double& maxDotProduct){
     int numDimensions = this->dimensionBounds.size();
-    assert(numDimensions == direction.getDimension());
+    assert(numDimensions == direction.size());
 
     minDotProduct = 0.0;
     maxDotProduct = 0.0;
@@ -284,7 +285,7 @@ void AxisAlignedBoundingVolume::getDotProductRangeInVolume(const Vector& directi
     }
 }
 
-Vector AxisAlignedBoundingVolume::getDirectionOfLargestVariance(){
+Eigen::VectorXd AxisAlignedBoundingVolume::getDirectionOfLargestVariance(){
     int numDimensions = dimensionBounds.size();
     double widestIntervalSize = 0;
     int dimIndex = -1;
@@ -297,7 +298,7 @@ Vector AxisAlignedBoundingVolume::getDirectionOfLargestVariance(){
         }
     }
 
-    Vector result(numDimensions);
+    Eigen::VectorXd result = Eigen::VectorXd::Zero(numDimensions);
     result[dimIndex] = 1;
     return result;
 }
@@ -318,19 +319,19 @@ void testBoundingVolume()
     cout << bv.toString() << endl;
 
     //
-    Vector v1(3);
+    Eigen::VectorXd v1(3);
     v1[0] = 1.0;
     v1[1] = -1.0;
     v1[2] = 3.0;
 
-    Vector v2(3);
+    Eigen::VectorXd v2(3);
     v2[0] = -2.0;
     v2[1] = 10.0;
     v2[2] = -9.0;
 
-    Vector v3(3);
+    Eigen::VectorXd v3(3);
 
-    vector<Vector> points;
+    vector<Eigen::VectorXd> points;
     points.push_back(v1);
     points.push_back(v2);
     points.push_back(v3);
@@ -342,34 +343,38 @@ void testBoundingVolume()
     double maxProduct;
     bv.getDotProductRangeInVolume(v1,minProduct,maxProduct);
     cout << "min product = " << minProduct << " maxProduct = " << maxProduct << endl;
+
+    //
+    Eigen::VectorXd vLV = bv.getDirectionOfLargestVariance();
+    cout << "Direction " << vecToString(vLV) << endl;
 }
 
 
 void testSphere(){
 
-    Vector v1(3);
+    Eigen::VectorXd v1(3);
     v1[0] = 1.0;
     v1[1] = -1.0;
     v1[2] = 3.0;
 
-    Vector v2(3);
+    Eigen::VectorXd v2(3);
     v2[0] = -2.0;
     v2[1] = 10.0;
     v2[2] = -9.0;
 
-    Vector v3(3);
+    Eigen::VectorXd v3(3);
 
-    vector<Vector> points;
+    vector<Eigen::VectorXd> points;
     points.push_back(v1);
     points.push_back(v2);
     points.push_back(v3);
 
-    Vector center(3);
+    Eigen::VectorXd center(3);
     double radius;
     MiniBallComputation::computeMiniBall(points,center,radius);
 
     cout << "Result of MiniBall" << endl;
-    cout << "    Center " << center.toString() << endl;
+    cout << "    Center " << vecToString(center) << endl;
     cout << "    radius " << radius << endl;
 }
 
