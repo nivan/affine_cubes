@@ -26,3 +26,13 @@ std::string Histogram2DBin::toString(){
     ss << "(" << minX << "," << maxX << ") X (" << minY << "," << maxY << ") : " << count;
     return ss.str();
 }
+
+double Histogram2DBin::getDataDensity(){
+    double area = (maxX - minX) * (maxY - minY);
+    if(area == 0){ //TODO: disconsidering the case of bins with a single points for now
+        return 0;
+    }
+    else{
+        return count / area;
+    }
+}

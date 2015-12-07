@@ -19,8 +19,8 @@ public:
     ~HistogramWidget();
 
 private:
-    BVTree<BOUNDING_VOLUME_T>* myTree;
-    //GeneralBVTree<BOUNDING_VOLUME_T>* myTree;
+    //BVTree<BOUNDING_VOLUME_T>* myTree;
+    GeneralBVTree<BOUNDING_VOLUME_T>* myTree;
     int depth;
     double minX;
     double maxX;
@@ -30,13 +30,19 @@ private:
 private:
     Vector* xAxis;
     Vector* yAxis;
+private:
+    bool showPoints;
+    bool showBins;
+    double pointsAlpha;
 protected:
     void paintEvent(QPaintEvent * event);
-
 signals:
 
 public slots:
     void setDepth(int);
+    void setShowPoints(bool);
+    void setShowBins(bool);
+    void setPtsAlpha(int);
 };
 
 #endif // HISTOGRAMWIDGET_H

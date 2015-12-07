@@ -39,7 +39,8 @@ SOURCES += main.cpp\
     ../affine_cube/dotproductcomparison.cpp \
     ../affine_cube/auxfunctions.cpp \
     ../affine_cube/histogram2dbin.cpp \
-    ../affine_cube/generalbvtree.cpp
+    ../affine_cube/generalbvtree.cpp \
+    scatterplotwidget.cpp
 
 HEADERS  += widget.h \
     ../affine_cube/Vector.h \
@@ -73,7 +74,8 @@ HEADERS  += widget.h \
     ../affine_cube/dotproductcomparison.h \
     ../affine_cube/auxfunctions.h \
     ../affine_cube/histogram2dbin.h \
-    ../affine_cube/generalbvtree.h
+    ../affine_cube/generalbvtree.h \
+    scatterplotwidget.h
 
 FORMS    += widget.ui
 

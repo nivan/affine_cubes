@@ -6,7 +6,7 @@
 std::vector<Vector> points;
 
 HistogramWidget::HistogramWidget(QWidget *parent) : QWidget(parent),
-    xAxis(NULL),yAxis(NULL)
+    xAxis(NULL),yAxis(NULL),showPoints(true),showBins(true), pointsAlpha(1.0)
 {
 
     //
@@ -46,7 +46,7 @@ HistogramWidget::HistogramWidget(QWidget *parent) : QWidget(parent),
     }
 
     readCSVPoints("../../data/i_band.csv",points);
-#elif 0
+#elif 1
     //random data
     int numDimensions = 2;
     xAxis = new Vector(numDimensions);
@@ -65,7 +65,7 @@ HistogramWidget::HistogramWidget(QWidget *parent) : QWidget(parent),
         points.push_back(point);
     }
 #elif 1
-    //random data
+    //one gaussian
     int numDimensions = 2;
     xAxis = new Vector(numDimensions);
     yAxis = new Vector(numDimensions);
@@ -74,7 +74,43 @@ HistogramWidget::HistogramWidget(QWidget *parent) : QWidget(parent),
     //
     (*yAxis)[1] = 1.0;
 
-    int numPoints = 1000;
+    int numPoints = 100000;
+    //
+    std::default_random_engine generator;
+    std::vector<std::normal_distribution<double> > distributions;
+    std::normal_distribution<double> distribution1(-2.0,0.5);
+    std::normal_distribution<double> distribution2(6.0,2);
+    std::normal_distribution<double> distribution3(0.0,5);
+    std::normal_distribution<double> distribution4(-3.0,1.0);
+    distributions.push_back(distribution1);
+    distributions.push_back(distribution2);
+    distributions.push_back(distribution3);
+    distributions.push_back(distribution4);
+
+    int numDistributions = distributions.size();
+
+    //
+    for(int i = 0 ; i < numPoints ; ++i){
+        Vector point(numDimensions);
+        for(int d = 0 ; d < numDimensions ; ++d){
+            std::normal_distribution<double>& distribution = distributions.at(rand() % numDistributions);
+            double number = distribution(generator);
+            point[d] = number;
+        }
+        points.push_back(point);
+    }
+#elif 1
+    //one gaussian
+    int numDimensions = 10;
+    xAxis = new Vector(numDimensions);
+    yAxis = new Vector(numDimensions);
+    //
+    (*xAxis)[0] = 1.0;
+    (*xAxis)[2] = 1.0;
+    //
+    (*yAxis)[1] = 1.0;
+
+    int numPoints = 10000;
     //
     std::default_random_engine generator;
     std::normal_distribution<double> distribution(0.0,1.0);
@@ -87,7 +123,6 @@ HistogramWidget::HistogramWidget(QWidget *parent) : QWidget(parent),
         }
         points.push_back(point);
     }
-
 #elif 1
     //random data
     int numDimensions = 2;
@@ -118,8 +153,8 @@ HistogramWidget::HistogramWidget(QWidget *parent) : QWidget(parent),
 
     //
     qDebug() << "building tree";
-    myTree = new BVTree<BOUNDING_VOLUME_T>(points);
-    //myTree = new GeneralBVTree<BOUNDING_VOLUME_T>(points);
+    //myTree = new BVTree<BOUNDING_VOLUME_T>(points);
+    myTree = new GeneralBVTree<BOUNDING_VOLUME_T>(points);
     qDebug() << "done building tree";
 
     myTree->getDotProductRange(*xAxis,minX,maxX);
@@ -145,56 +180,68 @@ void HistogramWidget::paintEvent(QPaintEvent * ){
 
 
     std::vector<Histogram2DBin> result;
-    myTree->getUnbinnedHistogram(*xAxis,*yAxis,depth,result);
-    int numbins = result.size();
 
     //
     QTransform m;
     m.scale(width() / (maxX - minX),height() / (maxY - minY));
     m.translate(-minX,-minY);
 
-    //cout << "LIMITS: [" << minX << ", " << maxX << ") X (" << minY << ", " << maxY << ")" << endl;
-
     //
-    float maxCount = 0;
-    //cout << "  Num Bins " << numbins << endl;
-    for(int i = 0 ; i < numbins ; ++i){
-        Histogram2DBin bin = result.at(i);
-        if(maxCount < bin.count){
-            maxCount = bin.count;
+    if(showBins){
+        myTree->getUnbinnedHistogram(*xAxis,*yAxis,depth,result);
+        int numbins = result.size();
+
+        //cout << "LIMITS: [" << minX << ", " << maxX << ") X (" << minY << ", " << maxY << ")" << endl;
+
+        //
+        float maxCount = 0;
+        //cout << "  Num Bins " << numbins << endl;
+        double sumDensity = 0;
+        int    countDensity = 0;
+        for(int i = 0 ; i < numbins ; ++i){
+            Histogram2DBin bin = result.at(i);
+            if(maxCount < bin.count){
+                maxCount = bin.count;
+            }
+            if(bin.count > 1){
+                sumDensity += bin.getDataDensity();
+                countDensity += 1;
+            }
         }
+
+        cout << "Depth " << depth << " average Density " << (sumDensity / countDensity) << endl;
+
+        qDebug() << "Num Bins " << numbins;
+        for(int i = 0 ; i < numbins ; ++i){
+            Histogram2DBin bin = result.at(i);
+            //cout << "    bin " << i << " " << bin.toString() << endl;
+            QColor color = this->scale->getColor(bin.count / maxCount);
+            color.setAlphaF(0.3);
+            painter.setBrush(color);
+            QPolygonF screenRect;
+            if(bin.count == 1){
+                //cout << "Found singleton" << endl;
+                QPointF center = m.map(QPointF(bin.minX,bin.minY));
+                int minHalfSize = 3;
+                screenRect = QRectF(center.x() - minHalfSize,center.y() - minHalfSize, 2 * minHalfSize, 2 * minHalfSize);
+            }
+            else{
+                screenRect = m.map(QRectF(QPointF(bin.minX,bin.minY),QPointF(bin.maxX,bin.maxY)));
+
+            }
+            QRectF bbox = screenRect.boundingRect();
+            //cout << "     screen rect: (" << bbox.left() << ", " << bbox.right() << ") X (" << bbox.top() << ", " << bbox.bottom() << ")" <<  endl;
+            painter.drawPolygon(screenRect);
+        }
+        //cout << "=================" << endl;
     }
 
-
-    //qDebug() << "Num Bins " << numbins;
-    for(int i = 0 ; i < numbins ; ++i){
-        Histogram2DBin bin = result.at(i);
-        //cout << "    bin " << i << " " << bin.toString() << endl;
-        QColor color = this->scale->getColor(bin.count / maxCount);
-        color.setAlphaF(0.3);
-        painter.setBrush(color);
-        QPolygonF screenRect;
-        if(bin.count == 1){
-            //cout << "Found singleton" << endl;
-            QPointF center = m.map(QPointF(bin.minX,bin.minY));
-            int minHalfSize = 3;
-            screenRect = QRectF(center.x() - minHalfSize,center.y() - minHalfSize, 2 * minHalfSize, 2 * minHalfSize);
-        }
-        else{
-            screenRect = m.map(QRectF(QPointF(bin.minX,bin.minY),QPointF(bin.maxX,bin.maxY)));
-
-        }
-        QRectF bbox = screenRect.boundingRect();
-        //cout << "     screen rect: (" << bbox.left() << ", " << bbox.right() << ") X (" << bbox.top() << ", " << bbox.bottom() << ")" <<  endl;
-        painter.drawPolygon(screenRect);
-    }
-    //cout << "=================" << endl;
-
     //
-    if(true){
-        QPen pointPen(Qt::blue,3);
+    if(showPoints){
+        QColor color = Qt::blue;
+        color.setAlphaF(pointsAlpha);
+        QPen pointPen(color,3);
         painter.setPen(pointPen);
-        painter.setBrush(Qt::blue);
         int numPoints = points.size();
         for(int i = 0 ; i < numPoints ; ++i){
             Vector& pt = points.at(i);
@@ -209,6 +256,21 @@ void HistogramWidget::paintEvent(QPaintEvent * ){
 
 void HistogramWidget::setDepth(int v){
     this->depth = v;
+    this->repaint();
+}
+
+void HistogramWidget::setShowPoints(bool v){
+    this->showPoints = v;
+    this->repaint();
+}
+
+void HistogramWidget::setShowBins(bool v){
+    this->showBins = v;
+    this->repaint();
+}
+
+void HistogramWidget::setPtsAlpha(int i){
+    this->pointsAlpha = i / 100.0;
     this->repaint();
 }
 
