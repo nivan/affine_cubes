@@ -11,12 +11,14 @@
 
 class HyperPlane{
 public:
+    //{x | <normalVector,x> + intecept = 0}
     Eigen::VectorXd normalVector;
     double intercept;
 public:
     HyperPlane();
     HyperPlane(Eigen::VectorXd& normalVector, double& intercept);
     int numDimensions();
+    std::string toString();
 };
 
 /******************
@@ -71,13 +73,14 @@ public:
  * AxisAlignedBoundingVolume *
  *****************************/
 
-class AxisAlignedBoundingVolume: public Polytope{
+class AxisAlignedBoundingBox: public Polytope{
 private:
     std::vector<std::pair<double,double> > dimensionBounds;
 public:
-    AxisAlignedBoundingVolume(std::vector<std::pair<double,double> >& dimensionBounds);
-    AxisAlignedBoundingVolume(std::vector<Eigen::VectorXd>& points);
-    AxisAlignedBoundingVolume(std::vector<Eigen::VectorXd>& points, int beginIndex, int endIndex);
+    AxisAlignedBoundingBox(std::vector<std::pair<double,double> >& dimensionBounds);
+    AxisAlignedBoundingBox(std::vector<Eigen::VectorXd>& points);
+    AxisAlignedBoundingBox(std::vector<Eigen::VectorXd>& points, int beginIndex, int endIndex);
+    ~AxisAlignedBoundingBox();
     std::string toString();
 public:
     int numPlanes();
@@ -85,13 +88,31 @@ public:
     void getDotProductRangeInVolume(const Eigen::VectorXd& direction, double& minV, double& maxV);
     Eigen::VectorXd getDirectionOfLargestVariance();
 public:
-    static AxisAlignedBoundingVolume* getAxisAlignedBoundingVolume(std::vector<Eigen::VectorXd>& points);
-    static AxisAlignedBoundingVolume* getAxisAlignedBoundingVolume(std::vector<Eigen::VectorXd>& points,int startIndex, int endIndex);
+    static AxisAlignedBoundingBox* getAxisAlignedBoundingVolume(std::vector<Eigen::VectorXd>& points);
+    static AxisAlignedBoundingBox* getAxisAlignedBoundingVolume(std::vector<Eigen::VectorXd>& points,int startIndex, int endIndex);
 };
 
-/*****************************
- * AxisAlignedBoundingVolume *
- *****************************/
+/**********************
+ * RotatedBoundingBox *
+ ***********************/
+
+class RotatedBoundingBox: public Polytope{
+private:
+    Eigen::MatrixXd                        rotationMatrix; //left multiplication transforms the canonical basis in the basis for this bounding box
+    std::vector<std::pair<double,double> > dimensionBounds; //limits of the bounding box in the rotated coordinates
+private:
+    void init(std::vector<Eigen::VectorXd>& points, int beginIndex, int endIndex);
+public:
+    RotatedBoundingBox(std::vector<Eigen::VectorXd>& points);
+    RotatedBoundingBox(std::vector<Eigen::VectorXd>& points, int beginIndex, int endIndex);
+    ~RotatedBoundingBox();
+    std::string toString();
+public:
+    int numPlanes();
+    HyperPlane getHyperPlane(int i);
+    void getDotProductRangeInVolume(const Eigen::VectorXd& direction, double& minV, double& maxV);
+    Eigen::VectorXd getDirectionOfLargestVariance();
+};
 
 /*****************
  * Aux Functions *
@@ -99,5 +120,6 @@ public:
 
 void testBoundingVolume();
 void testSphere();
+void testRoatedBox();
 
 #endif // BOUNDINGVOLUME_H

@@ -6,6 +6,7 @@
 #include "glhistogramwidget.h"
 #include "../affine_cube/generalbvtree.h"
 #include <iostream>
+#include "../pca/pca.h"
 
 #include <eigen3/Eigen/Dense>
 using namespace Eigen;
@@ -17,20 +18,13 @@ int main(int argc, char *argv[])
 {
 #if 0
     //testAuxFunctions();
-testBoundingVolume();
+    testBoundingVolume();
     //    testGeneralTree();
-        //    testBVTree();
+    //    testBVTree();
 
 #elif 0
-    VectorXd v(3);
-    v << 1, 2, 3;
-
-    cout << "V size " << v.size() << endl;
-    VectorXd w(v);
-    cout << "w * v =" << endl << w.dot(v) << endl;
-    cout << v[0] << "," << v[1] << "," << v[2] << endl;
-    cout << w[0] << "," << w[1] << "," << w[2] << endl;
-    MatrixXd m = MatrixXd::Random(3,3);
+    //testPCA();
+    testRoatedBox();
 #elif 0
     int numPoints = 20;
     double noisePortion = 0.05;

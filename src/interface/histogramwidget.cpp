@@ -64,7 +64,7 @@ HistogramWidget::HistogramWidget(QWidget *parent) : QWidget(parent),
         }
         points.push_back(point);
     }
-#elif 1
+#elif 0
     //one gaussian
     int numDimensions = 2;
     xAxis = new Eigen::VectorXd(Eigen::VectorXd::Zero(numDimensions));
@@ -101,26 +101,26 @@ HistogramWidget::HistogramWidget(QWidget *parent) : QWidget(parent),
     }
 #elif 1
     //one gaussian
-    int numDimensions = 10;
+    int numDimensions = 2;
     xAxis = new Eigen::VectorXd(Eigen::VectorXd::Zero(numDimensions));
     yAxis = new Eigen::VectorXd(Eigen::VectorXd::Zero(numDimensions));
     //
     (*xAxis)[0] = 1.0;
-    (*xAxis)[2] = 1.0;
     //
     (*yAxis)[1] = 1.0;
 
-    int numPoints = 10000;
+    int numPoints = 100;
     //
     std::default_random_engine generator;
-    std::normal_distribution<double> distribution(0.0,1.0);
+    std::normal_distribution<double> distribution(0.0,0.5);
     //
     for(int i = 0 ; i < numPoints ; ++i){
         Eigen::VectorXd point(numDimensions);
-        for(int d = 0 ; d < numDimensions ; ++d){
-            double number = distribution(generator);
-            point[d] = number;
-        }
+        double x = ((1.0 * rand()) / RAND_MAX) * 10.0;
+        double noise = distribution(generator);
+        double y = -x + noise;
+        point[0] = x;
+        point[1] = y;
         points.push_back(point);
     }
 #elif 1
@@ -144,7 +144,7 @@ HistogramWidget::HistogramWidget(QWidget *parent) : QWidget(parent),
             double number = distribution(generator);
             point[d] = number;
         }
-        cout << "Point " << i << " : " << point.toString() << endl;
+        cout << "Point " << i << " : " << point << endl;
         points.push_back(point);
     }
     cout << "================" << endl;
@@ -229,7 +229,7 @@ void HistogramWidget::paintEvent(QPaintEvent * ){
                 screenRect = m.map(QRectF(QPointF(bin.minX,bin.minY),QPointF(bin.maxX,bin.maxY)));
 
             }
-            QRectF bbox = screenRect.boundingRect();
+            //QRectF bbox = screenRect.boundingRect();
             //cout << "     screen rect: (" << bbox.left() << ", " << bbox.right() << ") X (" << bbox.top() << ", " << bbox.bottom() << ")" <<  endl;
             painter.drawPolygon(screenRect);
         }

@@ -56,7 +56,7 @@ void testBVTree(){
     }
 
     //
-    BVTree<AxisAlignedBoundingVolume> myTree(points);
+    BVTree<AxisAlignedBoundingBox> myTree(points);
     //
     Eigen::VectorXd queryVector(4);
     queryVector[0] = 1.0;
