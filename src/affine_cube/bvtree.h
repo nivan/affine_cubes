@@ -2,7 +2,7 @@
 #define BVTREE_H
 
 #include "boundingvolume.h"
-#include "dotproductcomparison.h"
+#include "comparators.h"
 #include "auxfunctions.h"
 #include "histogram2dbin.h"
 

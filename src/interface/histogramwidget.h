@@ -7,8 +7,8 @@
 #include "util/colorscale.h"
 
 //#define BOUNDING_VOLUME_T Sphere
-//#define BOUNDING_VOLUME_T AxisAlignedBoundingBox
-#define BOUNDING_VOLUME_T RotatedBoundingBox
+#define BOUNDING_VOLUME_T AxisAlignedBoundingBox
+//#define BOUNDING_VOLUME_T RotatedBoundingBox
 
 void readCSVPoints(QString filename,std::vector<Eigen::VectorXd>& points);
 

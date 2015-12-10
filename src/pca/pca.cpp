@@ -37,8 +37,8 @@ bool PCA::performPCA(const Eigen::MatrixXd& mat, MatrixXd& rotationMatrix){
     MatrixXd cov = (centered.adjoint() * centered) / double(mat.rows() - 1);
     SelfAdjointEigenSolver<MatrixXd> eigensolver(cov);
     if (eigensolver.info() != Success){
-        cout << "MAT" << endl << mat;
-        cout << "COV" << endl << cov;
+//        cout << "MAT" << endl << mat;
+//        cout << "COV" << endl << cov;
         //abort();
         return false;
     }

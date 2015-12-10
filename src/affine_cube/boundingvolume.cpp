@@ -531,6 +531,22 @@ void testRoatedBox(){
     points.push_back(v3);
     points.push_back(v4);
 
+    Eigen::VectorXd probeDirection(2);
+    probeDirection[0] = -50.0;
+    probeDirection[1] =  50.0;
+    double minV,maxV;
+
+    AxisAlignedBoundingBox axisBBox(points);
+    axisBBox.getDotProductRangeInVolume(probeDirection,minV,maxV);
+    cout << "Axis Aligned BBOX" << endl;
+    cout << axisBBox.toString();
+    cout << "inner product bounds [" << minV << " , " << maxV << "]" << endl;
+
     RotatedBoundingBox bbox(points);
+    bbox.getDotProductRangeInVolume(probeDirection,minV,maxV);
+    cout << "Rotated BBOX" << endl;
     cout << bbox.toString() << endl;
+    cout << "inner product bounds [" << minV << " , " << maxV << "]" << endl;
+
+
 }

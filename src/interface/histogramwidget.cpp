@@ -64,7 +64,7 @@ HistogramWidget::HistogramWidget(QWidget *parent) : QWidget(parent),
         }
         points.push_back(point);
     }
-#elif 0
+#elif 1
     //one gaussian
     int numDimensions = 2;
     xAxis = new Eigen::VectorXd(Eigen::VectorXd::Zero(numDimensions));
@@ -74,7 +74,7 @@ HistogramWidget::HistogramWidget(QWidget *parent) : QWidget(parent),
     //
     (*yAxis)[1] = 1.0;
 
-    int numPoints = 100000;
+    int numPoints = 10000;
     //
     std::default_random_engine generator;
     std::vector<std::normal_distribution<double> > distributions;
@@ -106,8 +106,10 @@ HistogramWidget::HistogramWidget(QWidget *parent) : QWidget(parent),
     yAxis = new Eigen::VectorXd(Eigen::VectorXd::Zero(numDimensions));
     //
     (*xAxis)[0] = 1.0;
+    //(*xAxis)[1] = 1.0;
     //
-    (*yAxis)[1] = 1.0;
+    //(*yAxis)[0] = 1.0;
+    (*yAxis)[1] = -1.0;
 
     int numPoints = 100;
     //

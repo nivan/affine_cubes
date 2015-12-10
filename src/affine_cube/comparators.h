@@ -1,8 +1,11 @@
-#ifndef DOTPRODUCTCOMPARISON_H
-#define DOTPRODUCTCOMPARISON_H
+#ifndef COMPARATOR_H
+#define COMPARATOR_H
 
 #include <eigen3/Eigen/Dense>
-//#include "Vector.h"
+
+/************************
+ * DotProductComparison *
+ ************************/
 
 struct DotProductComparison {
 private:
@@ -12,4 +15,4 @@ public:
   bool operator() (const Eigen::VectorXd& v1,const Eigen::VectorXd& v2);
 };
 
-#endif // DOTPRODUCTCOMPARISON_H
+#endif // COMPARATOR_H

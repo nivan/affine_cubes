@@ -1,8 +1,9 @@
 #include "auxfunctions.h"
-#include "dotproductcomparison.h"
+#include "comparators.h"
 #include <algorithm>
 #include <iostream>
 #include <sstream>
+#include "../ckmeans/Ckmeans.1d.dp.h"
 
 using namespace std;
 
@@ -18,6 +19,35 @@ void sortByDotProduct(std::vector<Eigen::VectorXd> &points, Eigen::VectorXd* dir
 void sortPortionByDotProduct(std::vector<Eigen::VectorXd>& points, int beginIndex, int endIndex, Eigen::VectorXd *direction){
     DotProductComparison comparator(direction);
     std::sort(points.begin() + beginIndex,points.begin() + endIndex,comparator);
+}
+
+void partitionVectorByClustering(std::vector<double>& sortedValues,int minNumClusters, int maxNumCluster,std::vector<std::pair<int,int> >& childrenPartition){
+    std::vector<double> clusteringData;
+    int numPoints = sortedValues.size();
+    clusteringData.push_back(0);//clustering code ignores the first element in the vector;
+    for(int i = 0 ; i < numPoints ; ++i){
+        clusteringData.push_back(sortedValues.at(i));
+    }
+    ClusterResult result = kmeans_1d_dp(clusteringData,minNumClusters,maxNumCluster);
+//    cout << "Num Clusters " << result.nClusters << endl;
+//    for(int i = 0 ; i <= numPoints ; ++i){
+//        cout << result.cluster.at(i) << "," ;
+//    }
+//    cout << endl;
+
+    //find not partitions
+    int beginIndex = 0;
+    int prevCluster = 1;
+    childrenPartition.clear();
+    for(int i = 1 ; i <= numPoints ; ++i){
+        int currentCluster = result.cluster.at(i);
+        if(currentCluster != prevCluster){
+            childrenPartition.push_back(make_pair(beginIndex,i-1));
+            beginIndex = i-1;
+            prevCluster = currentCluster;
+        }
+    }
+    childrenPartition.push_back(make_pair(beginIndex,numPoints));
 }
 
 

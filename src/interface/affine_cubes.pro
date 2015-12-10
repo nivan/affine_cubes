@@ -36,12 +36,13 @@ SOURCES += main.cpp\
     glhistogramwidget.cpp \
     ../miniball/Seb_debug.C \
     ../miniball/miniballcomputation.cpp \
-    ../affine_cube/dotproductcomparison.cpp \
+    ../affine_cube/comparators.cpp \
     ../affine_cube/auxfunctions.cpp \
     ../affine_cube/histogram2dbin.cpp \
     ../affine_cube/generalbvtree.cpp \
     scatterplotwidget.cpp \
-    ../pca/pca.cpp
+    ../pca/pca.cpp \
+    ../ckmeans/Ckmeans.1d.dp.cpp
 
 HEADERS  += widget.h \
     #../affine_cube/Vector.h \
@@ -72,12 +73,13 @@ HEADERS  += widget.h \
     ../miniball/Seb.h \
     ../miniball/Seb-inl.h \
     ../miniball/miniballcomputation.h \
-    ../affine_cube/dotproductcomparison.h \
+    ../affine_cube/comparators.h \
     ../affine_cube/auxfunctions.h \
     ../affine_cube/histogram2dbin.h \
     ../affine_cube/generalbvtree.h \
     scatterplotwidget.h \
-    ../pca/pca.h
+    ../pca/pca.h \
+    ../ckmeans/Ckmeans.1d.dp.h
 
 
 FORMS    += widget.ui
