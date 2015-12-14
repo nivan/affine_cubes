@@ -119,3 +119,10 @@ string vecToString(const Eigen::VectorXd &v){
 
     return ss.str();
 }
+
+void addPointToInterval(double &minInterval, double &maxInterval, double v){
+    if(v < minInterval)
+        minInterval = v;
+    if(v > maxInterval)
+        maxInterval = v;
+}

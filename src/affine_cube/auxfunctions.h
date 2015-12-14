@@ -10,6 +10,9 @@ void sortPortionByDotProduct(std::vector<Eigen::VectorXd>& points, int beginInde
 void partitionVectorByClustering(std::vector<double>& sortedValues,int minNumClusters, int maxNumCluster,std::vector<std::pair<int,int> >& childrenPartition);
 
 //
+void addPointToInterval(double& minInterval, double& maxInterval, double v);
+
+//
 std::string vecToString(const Eigen::VectorXd&);
 
 //

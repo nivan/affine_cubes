@@ -4,12 +4,15 @@
 #include "../affine_cube/boundingvolume.h"
 #include "../affine_cube/bvtree.h"
 #include "glhistogramwidget.h"
-#include "../affine_cube/generalbvtree.h"
+//#include "../affine_cube/generalbvtree.h"
 #include <iostream>
 #include "../pca/pca.h"
 #include "../affine_cube/auxfunctions.h"
 #include "../ckmeans/Ckmeans.1d.dp.h"
 #include <eigen3/Eigen/Dense>
+#include "../affine_cube/interval.h"
+#include "../affine_cube/affinecube.h"
+
 using namespace Eigen;
 using namespace std;
 
@@ -18,6 +21,25 @@ const int SIZE = 7;
 int main(int argc, char *argv[])
 {
 #if 0
+    testAffineCube();
+#elif 0
+    MatrixXd m(2,2);
+    m(0,0) = 3;
+    m(1,0) = 2.5;
+    m(0,1) = -1;
+    m(1,1) = m(1,0) + m(0,1);
+    VectorXd x(2);
+    x[0] = 1;
+    x[1] = 2;
+    
+    VectorXd y = m * x;
+    
+    std::cout << m << std::endl;
+    std::cout << y << std::endl;
+    
+    cout << "Here is mat.minCoeff():  " << y.minCoeff()  << endl;
+    cout << "Here is mat.maxCoeff():  " << y.maxCoeff()  << endl;
+#elif 0
     int minNumClusters = 2;
     int maxNumCluster  = 10;
 

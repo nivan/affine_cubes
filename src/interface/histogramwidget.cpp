@@ -3,7 +3,6 @@
 #include <cassert>
 #include <random>
 
-std::vector<Eigen::VectorXd> points;
 
 HistogramWidget::HistogramWidget(QWidget *parent) : QWidget(parent),
     xAxis(NULL),yAxis(NULL),showPoints(true),showBins(true), pointsAlpha(1.0)
@@ -15,7 +14,7 @@ HistogramWidget::HistogramWidget(QWidget *parent) : QWidget(parent),
 
 #if 0
     //random data
-    int numDimensions = 4;
+    int numDimensions = 2;
     xAxis = new Eigen::VectorXd(Eigen::VectorXd::Zero(numDimensions));
     yAxis = new Eigen::VectorXd(Eigen::VectorXd::Zero(numDimensions));
     //
@@ -23,7 +22,7 @@ HistogramWidget::HistogramWidget(QWidget *parent) : QWidget(parent),
     //
     (*yAxis)[1] = 1.0;
 
-    int numPoints = 1000;
+    int numPoints = 10000;
     for(int i = 0 ; i < numPoints ; ++i){
         Eigen::VectorXd point(numDimensions);
         for(int d = 0 ; d < numDimensions ; ++d){
@@ -74,7 +73,7 @@ HistogramWidget::HistogramWidget(QWidget *parent) : QWidget(parent),
     //
     (*yAxis)[1] = 1.0;
 
-    int numPoints = 10000;
+    int numPoints = 100000;
     //
     std::default_random_engine generator;
     std::vector<std::normal_distribution<double> > distributions;
@@ -156,13 +155,20 @@ HistogramWidget::HistogramWidget(QWidget *parent) : QWidget(parent),
     //
     qDebug() << "building tree";
     //myTree = new BVTree<BOUNDING_VOLUME_T>(points);
-    myTree = new GeneralBVTree<BOUNDING_VOLUME_T>(points);
+    //myTree = new GeneralBVTree<BOUNDING_VOLUME_T>(points);
+
+    vector<BoundingVolumeType> types;
+    types.push_back(AXIS_ALIGNED_BBOX);
+    myTree = AffineCube::buildTree(points,types);
+
     qDebug() << "done building tree";
 
-    myTree->getDotProductRange(*xAxis,minX,maxX);
-    myTree->getDotProductRange(*yAxis,minY,maxY);
-    //    minX = minY = 0.0;
-    //    maxX = maxY = 1.0;
+    Interval rangeX = myTree->getDotProductRange(*xAxis);
+    minX = rangeX.minValue;
+    maxX = rangeX.maxValue;
+    Interval rangeY = myTree->getDotProductRange(*yAxis);
+    minY = rangeY.minValue;
+    maxY = rangeY.maxValue;
 }
 
 HistogramWidget::~HistogramWidget()
@@ -211,9 +217,9 @@ void HistogramWidget::paintEvent(QPaintEvent * ){
             }
         }
 
-        cout << "Depth " << depth << " average Density " << (sumDensity / countDensity) << endl;
+        //cout << "Depth " << depth << " average Density " << (sumDensity / countDensity) << endl;
 
-        qDebug() << "Num Bins " << numbins;
+        //qDebug() << "Num Bins " << numbins;
         for(int i = 0 ; i < numbins ; ++i){
             Histogram2DBin bin = result.at(i);
             //cout << "    bin " << i << " " << bin.toString() << endl;

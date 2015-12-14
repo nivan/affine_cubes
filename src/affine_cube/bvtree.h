@@ -36,7 +36,6 @@ public:
     BVTreeNode* getLeftChild();
     BVTreeNode* getRightChild();
 public:
-
     int countNumPointsWithDotProductBetween(double minValue,double maxValue, Eigen::VectorXd& probeDirection);
     void getDotProductRange(const Eigen::VectorXd& direction, double &minValue, double& maxValue);
 };

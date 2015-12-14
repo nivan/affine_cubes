@@ -5,6 +5,8 @@
 //#include "Vector.h"
 #include <eigen3/Eigen/Dense>
 
+enum BoundingVolumeType {AXIS_ALIGNED_BBOX, ROTATED_BBOX, SPHERE};
+
 /**************
  * HyperPlane *
  **************/
